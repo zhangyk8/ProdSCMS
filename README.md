@@ -27,7 +27,12 @@ Some high-level descriptions of our Python scripts are as follows:
 - **Utility_fun.py**: This script contains all the utility functions for our experiments.
 - **Varying_Stepsize.py**: This script contains code for investigating the effects of varying the stepsize parameter in our proposed SCMS algorithm in Euclidean/directional product spaces. (Figures 9 and 10 in the arxiv version of the paper). The script takes more than 1.5 hours to execute due to the slow convergence of the proposed SCMS algorithm with step size "eta=1". The SCMS algorithm with our suggested choice of the step size parameter, however, does converge very fast.
 
+### Euclidean/Directional Product Spaces
 
+It is intuitive that the (Cartesian) product of two Euclidean spaces is again an Euclidean space whose dimension is the sum of the dimension of two factor (Euclidean) spaces. As the topology of such product space does not mathematically change, the regular kernel density estimator (KDE) as well as mean shift and SCMS algorithms are applicable in the Euclidean-Euclidean product space (Cheng, 1995; Comaniciu and Meer, 2002; Ozertem and Erdogmus, 2011). The Euclidean-directional and directional-directional product spaces, however, are not topologically equivalent to any of its factor spaces under any dimension. Moreover, even 
 
  ### Additional References
  - R. Ahumada, C. A. Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
+ - Y. Cheng. Mean shift, mode seeking, and clustering. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 17(8):790–799, 1995.
+ - D. Comaniciu and P. Meer. Mean shift: a robust approach toward feature space analysis. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 24(5):603–619, 2002.
+ - U. Ozertem and D. Erdogmus. Locally defined principal curves and surfaces. _Journal of Machine Learning Research_, 12(34):1249–1286, 2011.
