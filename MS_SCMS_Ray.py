@@ -4,7 +4,7 @@
 @author: Yikun Zhang
 Last Editing: May 25, 2021
 Description: This script contains code for the parallel implementations of 
-Euclidean/directional mean shift and SCMS algorithms.
+regular Euclidean/directional mean shift and SCMS algorithms.
 """
 
 import numpy as np
