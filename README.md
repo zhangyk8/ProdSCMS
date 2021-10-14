@@ -78,6 +78,8 @@ for <img src="https://latex.codecogs.com/svg.latex?&space;t=0,1,..."/>, where we
 
 * **Version B (Componentwise Mean Shift).** This version updates the sequence <img src="https://latex.codecogs.com/svg.latex?&space;\left\{\mathbf{z}^{(t)}\right\}_{t=0}^{\infty}=\left\{(\mathbf{x}^{(t)},\mathbf{y}^{(t)})\right\}_{t=0}^{\infty}"/>in a two-step manner as:
 
+<img src="https://latex.codecogs.com/svg.latex?\left(\mathbf{z}^{(t&plus;1)}&space;\right)^T&space;\gets&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{X}_i&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;K_2\left(\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}&space;\right)&space;}{\sum\limits_{i=1}^n&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;K_2\left(\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}&space;\right)}"/>
+
 
  ### Additional References
  - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
