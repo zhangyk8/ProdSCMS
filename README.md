@@ -66,7 +66,7 @@ where <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}=(\mathbf{
 
 <img src="https://latex.codecogs.com/svg.latex?\mathbf{H}&space;=\mathtt{Diag}\left(h_1^2\cdot\mathbf{I}_{D_1&plus;\mathbf{1}_{\{\mathcal{S}_1=\Omega_{D_1}\}}},&space;h_2^2\cdot\mathbf{I}_{D_2&space;&plus;&space;\mathbf{1}_{\{\mathcal{S}_2=\Omega_{D_2}\}}}&space;\right)" title="\mathbf{H} =\text{Diag}\left(h_1^2\cdot\mathbf{I}_{D_1+\mathbf{1}_{\{\mathcal{S}_1=\Omega_{D_1}\}}}, h_2^2\cdot\mathbf{I}_{D_2 + \mathbf{1}_{\{\mathcal{S}_2=\Omega_{D_2}\}}} \right)" />
 
-is a (block) diagonal bandwidth matrix, <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{I}_D"/> is the identity matrix in <img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{R}^{D\times&space;D}"/>, and <img src="https://latex.codecogs.com/svg.latex?&space;C(\mathbf{H}):=\prod_{j=1}^2 C_{k_j,D_j}(h_j)"/> is the normalizing constant.
+is a (block) diagonal bandwidth matrix, <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{I}_D"/> is the identity matrix in <img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{R}^{D\times&space;D}"/>, and <img src="https://latex.codecogs.com/svg.latex?&space;C(\mathbf{H}):=\prod_{j=1}^2C_{k_j,D_j}(h_j)"/> is the normalizing constant.
 
 
  ### Additional References
