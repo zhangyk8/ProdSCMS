@@ -46,7 +46,7 @@ Besides the aforementioned circular-circular data, there are many real-world dat
 
 ### 2. Mode and Ridge Estimation on Euclidean/directional product spaces with (Subspace Constrained) Mean Shift Algorithms
 
-Our interested data consist of independent and identically distributed (i.i.d.) observations <img src="https://latex.codecogs.com/png.latex?&space;\left\{\mathbf{Z}_i\right\}_{i=1}^n=\left\{(\mathbf{X}_i,\mathbf{Y}_i)\right\}_{i=1}^n"/> sampled from a distribution on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>, where 
+Our interested data consist of independent and identically distributed (i.i.d.) observations <img src="https://latex.codecogs.com/svg.latex?&space;\left\{\mathbf{Z}_i\right\}_{i=1}^n=\left\{(\mathbf{X}_i,\mathbf{Y}_i)\right\}_{i=1}^n"/> sampled from a distribution on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>, where 
 <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_j=\mathbb{R}^{D_j}\,\text{or}\,\Omega_{D_j}"/>
 for <img src="https://latex.codecogs.com/svg.latex?&space;j=1,2"/>. While we only present the formulations of our proposed algorithms and related theory on (Cartesian) product spaces with two factors, our implementations (i.e., associated functions in **DirLinProdSCMS_fun.py** and **DirLinProdSCMS_Ray.py**) are adaptive to any product space with arbitrarily finte number of Euclidean/directional factor spaces.
 
@@ -54,11 +54,11 @@ for <img src="https://latex.codecogs.com/svg.latex?&space;j=1,2"/>. While we onl
 
 It is natural to leverage a product kernel to construct a kernel density estimator (KDE) on <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}=(\mathbf{x},\mathbf{y})\in\mathcal{S}_1\times\mathcal{S}_2"/> as:
 
-<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat{f}_{\mathbf{h}}(\mathbf{x},\mathbf{y})=\frac{1}{n}\sum_{i=1}^nK_1\left(\frac{\mathbf{x}-\mathbf{X}_i}{h_1}\right)K_2\left(\frac{\mathbf{y}-\mathbf{Y}_i}{h_2}\right)"/>,
+<img src="https://latex.codecogs.com/svg.latex?&space;\hat{f}_{\mathbf{h}}(\mathbf{x},\mathbf{y})=\frac{1}{n}\sum_{i=1}^nK_1\left(\frac{\mathbf{x}-\mathbf{X}_i}{h_1}\right)K_2\left(\frac{\mathbf{y}-\mathbf{Y}_i}{h_2}\right)"/>,
+
 where each element of <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{h}=(h_1,h_2)"/> is a bandwidth parameter and the kernel functions <img src="https://latex.codecogs.com/svg.latex?&space;K_j:\mathcal{S}_j\to\mathbb{R}"/> for <img src="https://latex.codecogs.com/svg.latex?&space;j=1,2"/> take the form
 
-<img src="https://latex.codecogs.com/png.latex?&space;K_j(\mathbf{u})=C_{k_j,D_j}(h_j)\cdot\,k_j\left(||\mathbf{u}||_2^2\right)=\begin{cases}\frac{C_{k,D_j}}{h_i^{D_j}}\cdot\,k\left(\frac{||\mathbf{u}||_2^2}{2}\right)&\text{ if } \mathcal{S}_j =\mathbb{R}^{D_j},\\
-C_{L,D_j}(h_j) \cdot L\left(\frac{\norm{\bm{u}}_2^2}{2} \right) & \text{ if } \mathcal{S}_j =\Omega_{D_j},"/>
+<a href="https://latex.codecogs.com/svg.latex?&space;K_j(\mathbf{u})&space;=&space;C_{k_j,D_j}(h_j)&space;\cdot&space;k_j\left(||\mathbf{u}||_2^2&space;\right)&space;=&space;\begin{cases}&space;\frac{C_{k,D_j}}{h_i^{D_j}}\cdot&space;k\left(\frac{||\mathbf{u}||_2^2}{2}&space;\right)&space;&&space;\text{&space;if&space;}&space;\mathcal{S}_j&space;=\mathbb{R}^{D_j},\\&space;C_{L,D_j}(h_j)&space;\cdot&space;L\left(\frac{||\mathbf{u}||_2^2}{2}&space;\right)&space;&&space;\text{&space;if&space;}&space;\mathcal{S}_j&space;=\Omega_{D_j},&space;\end{cases}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?K_j(\mathbf{u})&space;=&space;C_{k_j,D_j}(h_j)&space;\cdot&space;k_j\left(||\mathbf{u}||_2^2&space;\right)&space;=&space;\begin{cases}&space;\frac{C_{k,D_j}}{h_i^{D_j}}\cdot&space;k\left(\frac{||\mathbf{u}||_2^2}{2}&space;\right)&space;&&space;\text{&space;if&space;}&space;\mathcal{S}_j&space;=\mathbb{R}^{D_j},\\&space;C_{L,D_j}(h_j)&space;\cdot&space;L\left(\frac{||\mathbf{u}||_2^2}{2}&space;\right)&space;&&space;\text{&space;if&space;}&space;\mathcal{S}_j&space;=\Omega_{D_j},&space;\end{cases}" title="K_j(\mathbf{u}) = C_{k_j,D_j}(h_j) \cdot k_j\left(||\mathbf{u}||_2^2 \right) = \begin{cases} \frac{C_{k,D_j}}{h_i^{D_j}}\cdot k\left(\frac{||\mathbf{u}||_2^2}{2} \right) & \text{ if } \mathcal{S}_j =\mathbb{R}^{D_j},\\ C_{L,D_j}(h_j) \cdot L\left(\frac{||\mathbf{u}||_2^2}{2} \right) & \text{ if } \mathcal{S}_j =\Omega_{D_j}, \end{cases}" /></a>
 
 
  ### Additional References
