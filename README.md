@@ -68,6 +68,10 @@ where <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}=(\mathbf{
 
 is a (block) diagonal bandwidth matrix, <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{I}_D"/> is the identity matrix in <img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{R}^{D\times&space;D}"/>, and <img src="https://latex.codecogs.com/svg.latex?\footnotesize&space;C(\mathbf{H}):=\prod_{j=1}^2C_{k_j,D_j}(h_j)"/> is the normalizing constant.
 
+#### 2.2 Mean Shift Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
+
+We
+
 
  ### Additional References
  - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
