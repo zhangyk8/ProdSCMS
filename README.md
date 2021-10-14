@@ -35,12 +35,10 @@ It is intuitive that the (Cartesian) product of two Euclidean spaces is again an
 
 where <img src="https://latex.codecogs.com/svg.latex?&space;||\cdot||_2"/> is the usual Euclidean norm in <img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{R}^{q+1}"/>. The supports <img src="https://latex.codecogs.com/svg.latex?&space;\Omega_2"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\Omega_1\times\Omega_1"/> of the same dataset are topological different; see Figure 1 below. Therefore, it is worthwhile to reconsider (subspace constrained) mean shift algorithms as well as the related mode and ridge estimation problems in Euclidean/directional product spaces.
 
-<!--
 <p align="center">
-<img src="https://github.com/zhangyk8/EuDirSCMS/blob/main/Figures/Output.png" style="zoom:60%" />
+<img src="https://github.com/zhangyk8/ProdSCMS/blob/main/Figures/curve_sph_torus.png" style="zoom:60%" />
  <br><B>Fig 1. </B>Simulated dataset <img src="https://latex.codecogs.com/svg.latex?&space;\left\{(\theta_i,\phi_i\right\}_{i=1}^n"/> on <img src="https://latex.codecogs.com/svg.latex?&space;\Omega_2"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\Omega_1\times\Omega_1"/> . Each observation <img src="https://latex.codecogs.com/svg.latex?&space;(\phi_i,\theta_i)"/> is sampled uniformly from <img src="https://latex.codecogs.com/svg.latex?&space;\left[2p_1\pi,2(p_1+1)\pi\right)\times\{2p_2\pi\}"/> for some integers <img src="https://latex.codecogs.com/svg.latex?&space;p_1,p_2"/>.
  </p>
--->
 
 Besides the aforementioned circular-circular data, there are many real-world datasets whose observations lie on a Euclidean/directional product space. For instance, in astronomical survey data, each object has its right ascension (RA) and declination (DEC) on a celestial sphere, while its redshift measures its distance to the Earth. The collection of (RA,DEC,Redshift) tuples thus forms a directional-linear dataset.
 
