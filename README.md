@@ -68,7 +68,11 @@ is a (block) diagonal bandwidth matrix, <img src="https://latex.codecogs.com/svg
 
 #### 2.2 Mean Shift Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
 
-We
+By taking the total gradient of KDE and equating each of its components to 0, we derive two different versions of the mean shift algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>.
+
+* **Version A (Simultaneous Mean Shift).** This version updates all the components <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}^{(t)}=(\mathbf{x}^{(t)},\mathbf{y}^{(t)})=\mathcal{S}_1\times\mathcal{S}_2"/> simultaneously as:
+
+<img src="https://latex.codecogs.com/svg.latex?\left(\mathbf{z}^{(t&plus;1)}&space;\right)^T&space;\gets&space;\begin{pmatrix}&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{X}_i&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;K_2\left(\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}&space;\right)&space;}{\sum\limits_{i=1}^n&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;K_2\left(\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}&space;\right)}\\&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{Y}_i&space;K_1\left(\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}&space;\right)&space;k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)&space;}{\sum\limits_{i=1}^n&space;K_1\left(\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}&space;\right)&space;k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}&space;\end{pmatrix}"/>
 
 
  ### Additional References
