@@ -76,6 +76,8 @@ By taking the total gradient of KDE and equating each of its components to 0, we
 
 for <img src="https://latex.codecogs.com/svg.latex?&space;t=0,1,..."/>, where we require extra standardizations <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{x}^{(t+1)}\gets\frac{\mathbf{x}^{(t+1)}}{||\mathbf{x}^{(t+1)}||_2}"/> and/or <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{y}^{(t+1)}\gets\frac{\mathbf{y}^{(t+1)}}{||\mathbf{y}^{(t+1)}||_2}"/> if <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1=\Omega_{D_1}"/> and/or <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_2=\Omega_{D_2}"/>.
 
+* **Version B (Componentwise Mean Shift).** This version updates the sequence <img src="https://latex.codecogs.com/svg.latex?&space;\left\{\mathbf{z}^{(t)}\right\}_{t=0}^{\infty}=\left\{(\mathbf{x}^{(t)},\mathbf{y}^{(t)})\right\}_{t=0}^{\infty}"/>in a two-step manner as:
+
 
  ### Additional References
  - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
