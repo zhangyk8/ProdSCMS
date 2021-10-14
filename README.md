@@ -86,7 +86,9 @@ and
 
 for <img src="https://latex.codecogs.com/svg.latex?&space;t=0,1,..."/>. The formula updates the two components <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{x}^{(t)}"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{y}^{(t)}"/> alternatively by first holding <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{y}^{(t)}"/> , updating <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{x}^{(t)}"/>, and then switching their roles. Such updating procedures borrows the spirit of the well-known coordinate ascent/descent algorithm (Wright, 2015).
 
-#### SCMS Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
+#### 2.3 SCMS Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
+
+
 
 
 
