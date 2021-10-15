@@ -100,9 +100,9 @@ Under the Gaussian and/or von Mises kernels, we formulate a valid SCMS iterative
 
 where <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> is the step size parameter managing the learning rate and convergence performance of our proposed SCMS algorithm. As a guideline, we suggest taking the step size to be adaptive to bandwidth parameters as:
 
-<img src="https://latex.codecogs.com/svg.latex?&space;\eta=\min\{\max(\mathbf{h})\cdot\min(\bm{h}),1\}=\min\left\{h_1\cdot&space;h_2,1\right\}"/>
+<img src="https://latex.codecogs.com/svg.latex?&space;\eta=\min\{\max(\mathbf{h})\cdot\min(\mathbf{h}),1\}=\min\left\{h_1\cdot&space;h_2,1\right\}"/>
 
-so that when <img src="https://latex.codecogs.com/svg.latex?&space;h_1,h_2\lesssim&space;h"/> are small, <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> mimics the asymptotic rate <img src="https://latex.codecogs.com/svg.latex?&space;O(h^2)"/> of adaptive step sizes in Euclidean/directional (subspace constrained) mean shift algorithms (Cheng, 1995; Arias-Castro et al., 2016; Zhang and Chen, 2021).
+so that when <img src="https://latex.codecogs.com/svg.latex?&space;h_1,h_2\lesssim&space;h"/> are small, <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> mimics the asymptotic rate <img src="https://latex.codecogs.com/svg.latex?&space;O(h^2)"/> of adaptive step sizes in Euclidean/directional (subspace constrained) mean shift algorithms (Cheng, 1995; Arias-Castro et al., 2016; Zhang and Chen, 2021). The upper bound 1 is introduced to prevent <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> from being too large.
 
 ### 3. Example Code
 
