@@ -68,7 +68,7 @@ is a (block) diagonal bandwidth matrix, <img src="https://latex.codecogs.com/svg
 
 #### 2.2 Mean Shift Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
 
-By taking the total gradient of KDE and equating each of its components to 0, we derive two different versions of the mean shift algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>.
+By taking the total gradient of KDE and equating each of its components to 0, we derive two different versions of the mean shift algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>; see more details in our paper.
 
 * **Version A (Simultaneous Mean Shift).** This version updates all the components <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}^{(t)}=(\mathbf{x}^{(t)},\mathbf{y}^{(t)})=\mathcal{S}_1\times\mathcal{S}_2"/> simultaneously as:
 
@@ -88,8 +88,11 @@ for <img src="https://latex.codecogs.com/svg.latex?&space;t=0,1,..."/>. The form
 
 #### 2.3 SCMS Algorithm on <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/>
 
+Naively, one may adopt the standard SCMS iterative formula in Ozertem and Erdogmus (2011) and update the SCMS sequence <img src="https://latex.codecogs.com/svg.latex?&space;\left\{\mathbf{z}^{(t)}\right\}_{t=0}^{\infty}=\left\{(\mathbf{x}^{(t)},\mathbf{y}^{(t)})\right\}_{t=0}^{\infty}\subset\mathcal{S}_1\times\mathcal{S}_2"/> as:
 
+<img src="https://latex.codecogs.com/svg.latex?\mathbf{z}^{(t&plus;1)}&space;\gets&space;\mathbf{z}^{(t)}&space;&plus;&space;\hat{V}_d(\mathbf{z}^{(t)})&space;\hat{V}_d(\mathbf{z}^{(t)})^T\begin{pmatrix}&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{X}_i&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2\right)&space;}{\sum\limits_{i=1}^n&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2\right)}-\mathbf{x}^{(t)}\\&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{Y}_i&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2\right)&space;k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)&space;}{\sum\limits_{i=1}^n&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2\right)&space;k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}-\mathbf{y}^{(t)}\end{pmatrix}"/>,
 
+where <img src="https://latex.codecogs.com/svg.latex?&space;\hat{V}_d(\mathbf{z})=\left[\hat{\mathbf{v}}_{d+1}(\mathbf{z}),...,\hat{\mathbf{v}}_{D_1+D_2}(\mathbf{z})\right]"/> has its columns as orthonormal eigenvectors of the (estimated) Riemannian Hessian <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{H}\hat{f}_{\mathbf{h}}(\mathbf{z})"/> with the tangent space of <img src="https://latex.codecogs.com/svg.latex?&space;\mathcal{S}_1\times\mathcal{S}_2"/> at <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{z}"/>.
 
 
  ### Additional References
