@@ -334,6 +334,8 @@ fig.savefig('./Figures/DirLin_example.png')
 <img src="https://github.com/zhangyk8/ProdSCMS/blob/main/Figures/DirLin_example.png" style="zoom:60%" />
  <br><B>Fig 2. </B>Illustrative plots of applying our proposed mean shift and SCMS algorithms to simulated directional-linear datasets.
  </p>
+ 
+ Other simulation studies on directional-directional data (e.g., observations on a torus) and real-world applications of our proposed (subspace constrained) mean shift algorithms can be found in our paper.
 
 ### Additional References
  - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
