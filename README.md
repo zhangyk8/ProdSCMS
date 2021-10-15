@@ -171,3 +171,6 @@ Further, the implementations of simultaneous and componentwise mean shift algori
  - S. J. Wright. Coordinate descent algorithms. _Mathematical Programming_, 151(1):3–34, 2015.
  - E. Arias-Castro, D. Mason, and B. Pelletier. On the estimation of the gradient lines of a density and the consistency of the mean-shift algorithm. _Journal of Machine Learning Research_, 17(43):1–28, 2016.
  - Y. Zhang and Y.-C. Chen. Linear convergence of the subspace constrained mean shift algorithm: From euclidean to directional data. arXiv preprint [arXiv:2104.14977](https://arxiv.org/abs/2104.14977), 2021.
+ - E. Garcı́a-Portugués (2013). Exact risk improvement of bandwidth selectors for kernel density estimation with directional data. _Electronic Journal of Statistics_ **7** 1655–1685.
+- Y.-C. Chen, C. Genovese, and L. Wasserman (2016). [A comprehensive approach to mode clustering](https://projecteuclid.org/euclid.ejs/1455715961). _Electronic Journal of Statistics_ **10**(1) 210-241.
+
