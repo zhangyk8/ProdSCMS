@@ -96,12 +96,78 @@ where <img src="https://latex.codecogs.com/svg.latex?&space;\widehat{V}_d(\mathb
 
 Under the Gaussian and/or von Mises kernels, we formulate a valid SCMS iterative formula by rescaling each component of the mean shift vector with the bandwidth matrix <img src="https://latex.codecogs.com/svg.latex?&space;\mathbf{H}"/> as:
 
-<img src="https://latex.codecogs.com/svg.latex?\mathbf{z}^{(t&plus;1)}&space;\gets\mathbf{z}^{(t)}&plus;\eta\cdot\hat{V}_d(\mathbf{z}^{(t)})&space;\hat{V}_d(\mathbf{z}^{(t)})^T\mathbf{H}^{-1}\begin{pmatrix}&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{X}_i&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)&space;}{\sum\limits_{i=1}^n&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|&space;\right)}-\mathbf{x}^{(t)}&space;\\&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{Y}_i&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}{\sum\limits_{i=1}^n&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}-\mathbf{y}^{(t)}&space;\end{pmatrix}"/>.
+<img src="https://latex.codecogs.com/svg.latex?\mathbf{z}^{(t&plus;1)}&space;\gets\mathbf{z}^{(t)}&plus;\eta\cdot\hat{V}_d(\mathbf{z}^{(t)})&space;\hat{V}_d(\mathbf{z}^{(t)})^T\mathbf{H}^{-1}\begin{pmatrix}&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{X}_i&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)&space;}{\sum\limits_{i=1}^n&space;k_1'\left(\left|\left|\frac{\mathbf{x}^{(t)}&space;-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)&space;k_2\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|&space;\right)}-\mathbf{x}^{(t)}&space;\\&space;\frac{\sum\limits_{i=1}^n&space;\mathbf{Y}_i&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}{\sum\limits_{i=1}^n&space;k_1\left(\left|\left|\frac{\mathbf{x}^{(t)}-\mathbf{X}_i}{h_1}\right|\right|_2^2&space;\right)k_2'\left(\left|\left|\frac{\mathbf{y}^{(t)}-\mathbf{Y}_i}{h_2}\right|\right|_2^2&space;\right)}-\mathbf{y}^{(t)}&space;\end{pmatrix}"/>,
+
+where <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> is the step size parameter managing the learning rate and convergence performance of our proposed SCMS algorithm. As a guideline, we suggest taking the step size to be adaptive to bandwidth parameters as:
+
+<img src="https://latex.codecogs.com/svg.latex?&space;\eta=\min\{\max(\mathbf{h})\cdot\min(\bm{h}),1\}=\min\left\{h_1\cdot&space;h_2,1\right\}"/>
+
+so that when <img src="https://latex.codecogs.com/svg.latex?&space;h_1,h_2\lesssim&space;h"/> are small, <img src="https://latex.codecogs.com/svg.latex?&space;\eta"/> mimics the asymptotic rate <img src="https://latex.codecogs.com/svg.latex?&space;O(h^2)"/> of adaptive step sizes in Euclidean/directional (subspace constrained) mean shift algorithms (Cheng, 1995; Arias-Castro et al., 2016; Zhang and Chen, 2021).
+
+### 3. Example Code
+
+The implementation of KDE in any Euclidean/directional product space is through the Python function called `DirLinProdKDE` in the script **DirLinProdSCMS_fun.py**.
+Further, the implementations of simultaneous and componentwise mean shift algorithms are encapsulated into two Python functions called `DirLinProdMS` and `DirLinProdMSCompAsc` in the script **DirLinProdSCMS_fun.py**, respectively. The input arguments of `DirLinProdMS` and `DirLinProdMSCompAsc` are the same, and we notice that their outputs are identical, though the simultaneous version seems to be faster in the convergence speed. Finally, we implement our proposed SCMS algorithm in any Euclidean/directional product space on the Python functions `DirLinProdSCMS` and `DirLinProdSCMSLog` under log-density in the same script **DirLinProdSCMS_fun.py**. As the input arguments of `DirLinProdSCMSLog` subsumes the ones of `DirLinProdKDE` and `DirLinProdMS`/`DirLinProdMSCompAsc`, we combine the descriptions of their arguments as follows:
+
+`def DirLinProdKDE(x, data, h=[None,None], com_type=['Dir', 'Lin'], dim=[2,1]):`
+
+`def DirLinProdMS(mesh_0, data, h=[None,None], com_type=['Dir','Lin'], dim=[2,1], eps=1e-7, max_iter=1000):`
+
+`def DirLinProdMSCompAsc(mesh_0, data, h=[None,None], com_type=['Dir','Lin'], dim=[2,1], eps=1e-7, max_iter=1000):`
+
+`def DirLinProdSCMSLog(mesh_0, data, d=1, h=[None,None], com_type=['Dir','Lin'], dim=[2,1], eps=1e-7, max_iter=1000, eta=None):`
+    
+- Parameters:
+    - mesh_0: (m, sum(dim)+sum(com_type=='Dir'))-array
+        ---- Eulidean coordinates of m query points in the product space, where 
+        (dim\[0\]+1) / dim\[0\] is the Euclidean dimension of a directional/linear 
+        component (first (dim\[0\]+1) columns), and so on.
+
+    - data: (n, sum(dim)+sum(com_type=='Dir'))-array
+        ---- Euclidean coordinates of n random sample points in the product space, 
+        where (dim\[0\]+1) / dim\[0\] is the Euclidean dimension of a 
+        directional/linear component (first (dim\[0\]+1) columns), and so on.
+    
+    - d: int
+        ---- The order of the density ridge. (Default: d=1.)
+   
+    - h: list of floats
+        ---- Bandwidth parameters for all the components. (Default: h=\[None\]*K, 
+        where K is the number of components in the product space. Whenever
+        h\[k\]=None for some k=1,...,K, then a rule of thumb for directional 
+        KDE with the von Mises kernel in Garcia-Portugues (2013) is applied 
+        to that directional component or the Silverman's rule of thumb is 
+        applied to that linear component; see Chen et al.(2016) for details.)
+        
+    - com_type: list of strings
+        ---- Indicators of the data type for all the components. If com_type\[k\]='Dir',
+        then the corresponding component is directional. If com_type\[k\]='Lin', 
+        then the corresponding component is linear.
+        
+    - dim: list of ints
+        ---- Intrinsic data dimensions of all the directional/linear components.
+   
+    - eps: float
+        ---- The precision parameter. (Default: eps=1e-7.)
+   
+    - max_iter: int
+        ---- The maximum number of iterations for the SCMS algorithm on each 
+        initial point. (Default: max_iter=1000.)
+    
+    - eta: float
+        ---- The step size parameter for the SCMS algorithm. (Default: eta=None, 
+        then eta=np.min(\[np.min(h) * np.max(h), 1\]).)
+        
+- Return:
+    - SCMS_path: (m, sum(dim)+sum(com_type=='Dir'), T)-array
+        ---- The entire iterative SCMS sequence for each initial point.
 
 
- ### Additional References
+### Additional References
  - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
  - Y. Cheng. Mean shift, mode seeking, and clustering. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 17(8):790–799, 1995.
  - D. Comaniciu and P. Meer. Mean shift: a robust approach toward feature space analysis. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 24(5):603–619, 2002.
  - U. Ozertem and D. Erdogmus. Locally defined principal curves and surfaces. _Journal of Machine Learning Research_, 12(34):1249–1286, 2011.
  - S. J. Wright. Coordinate descent algorithms. _Mathematical Programming_, 151(1):3–34, 2015.
+ - E. Arias-Castro, D. Mason, and B. Pelletier. On the estimation of the gradient lines of a density and the consistency of the mean-shift algorithm. _Journal of Machine Learning Research_, 17(43):1–28, 2016.
+ - Y. Zhang and Y.-C. Chen. Linear convergence of the subspace constrained mean shift algorithm: From euclidean to directional data. arXiv preprint [arXiv:2104.14977](https://arxiv.org/abs/2104.14977), 2021.
