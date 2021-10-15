@@ -107,7 +107,7 @@ so that when <img src="https://latex.codecogs.com/svg.latex?&space;h_1,h_2\lesss
 ### 3. Example Code
 
 The implementation of KDE in any Euclidean/directional product space is through the Python function called `DirLinProdKDE` in the script **DirLinProdSCMS_fun.py**.
-Further, the implementations of simultaneous and componentwise mean shift algorithms are encapsulated into two Python functions called `DirLinProdMS` and `DirLinProdMSCompAsc` in the script **DirLinProdSCMS_fun.py**, respectively. The input arguments of `DirLinProdMS` and `DirLinProdMSCompAsc` are the same, and we notice that their outputs are identical, though the simultaneous version seems to be faster in the convergence speed. Finally, we implement our proposed SCMS algorithm in any Euclidean/directional product space on the Python functions `DirLinProdSCMS` and `DirLinProdSCMSLog` under log-density in the same script **DirLinProdSCMS_fun.py**. As the input arguments of `DirLinProdSCMSLog` subsumes the ones of `DirLinProdKDE` and `DirLinProdMS`/`DirLinProdMSCompAsc`, we combine the descriptions of their arguments as follows:
+Further, the implementations of simultaneous and componentwise mean shift algorithms are encapsulated into two Python functions called `DirLinProdMS` and `DirLinProdMSCompAsc` in the script **DirLinProdSCMS_fun.py**, respectively. The input arguments of `DirLinProdMS` and `DirLinProdMSCompAsc` are the same, and we notice that their outputs are identical, though the simultaneous version seems to be faster in the convergence speed. Finally, we implement our proposed SCMS algorithm in any Euclidean/directional product space on the Python functions `DirLinProdSCMS` and `DirLinProdSCMSLog` under log-density in the same script **DirLinProdSCMS_fun.py**. As the input arguments of `DirLinProdSCMSLog` subsume the ones of `DirLinProdKDE` and `DirLinProdMS`/`DirLinProdMSCompAsc`, we combine the descriptions of their arguments as follows:
 
 `def DirLinProdKDE(x, data, h=[None,None], com_type=['Dir', 'Lin'], dim=[2,1]):`
 
@@ -161,6 +161,175 @@ Further, the implementations of simultaneous and componentwise mean shift algori
 - Return:
     - SCMS_path: (m, sum(dim)+sum(com_type=='Dir'), T)-array
         ---- The entire iterative SCMS sequence for each initial point.
+
+We also provide the corresponding implementations of the above functions under the [Ray](https://ray.io/) parallel programming environment as `DirLinProdKDE_Fast`, `DirLinProdMS_Fast`, `DirLinProdMSCompAsc_Fast`, and `DirLinProdSCMSLog_Fast` in the script **DirLinProdSCMS_Ray.py**.
+
+Example code:
+```bash
+import numpy as np
+import scipy.special as sp
+import matplotlib.pyplot as plt
+from DirLinProdSCMS_fun import DirLinProdKDE, DirLinProdMS, DirLinProdSCMSLog
+from Utility_fun import vMF_Gauss_mix
+
+## Simulation 1: Mode-seeking on a directional-linear space $\Omega_1 \times \mathbb{R}$
+np.random.seed(123)  ## Set an arbitrary seed for reproducibility
+prob1 = [2/5, 1/5, 2/5]   ## Mixture probabilities
+mu_N1 = np.array([[0], [1], [2]])  ## Means of the Gaussian component
+cov1 = np.array([1/4, 1, 1]).reshape(1,1,3)   ## Variances of the Gaussian components
+mu_vMF1 = np.array([[1, 0], [0, 1], [-1, 0]])   ## Means of the vMF components
+kappa1 = [3, 10, 3]   ## Concentration parameters of the vMF components
+# Sample 1000 points from the vMF-Gaussian mixture model
+vMF_Gau_data = vMF_Gauss_mix(1000, q=1, D=1, mu_vMF=mu_vMF1, kappa=kappa1, 
+                             mu_N=mu_N1, cov=cov1, prob=prob1)
+# Convert the vMF components of the simulated data to their angular coordinates
+Angs = np.arctan2(vMF_Gau_data[:,1], vMF_Gau_data[:,0])
+vMF_Gau_Ang = np.concatenate([Angs.reshape(-1,1), vMF_Gau_data[:,2].reshape(-1,1)], axis=1)
+
+# Bandwidth selection
+data = vMF_Gau_data
+n = vMF_Gau_data.shape[0]
+q = 1
+D = 1
+data_Dir = data[:,:(q+1)]
+data_Lin = data[:,(q+1):(q+1+D)]
+## Rule-of-thumb bandwidth selector for the directional component
+R_bar = np.sqrt(sum(np.mean(data_Dir, axis=0) ** 2))
+kap_hat = R_bar * (q + 1 - R_bar ** 2) / (1 - R_bar ** 2)
+h = ((4 * np.sqrt(np.pi) * sp.iv((q-1) / 2 , kap_hat)**2) / \
+     (n * kap_hat ** ((q+1) / 2) * (2 * q * sp.iv((q+1)/2, 2*kap_hat) + \
+     (q+2) * kap_hat * sp.iv((q+3)/2, 2*kap_hat)))) ** (1/(q + 4))
+bw_Dir = h
+print("The current bandwidth for directional component is " + str(h) + ".\n")
+## Normal reference rule of bandwidth selector for the linear component
+b = (4/(D+2))**(1/(D+4))*(n**(-1/(D+4)))*np.mean(np.std(data_Lin, axis=0))
+bw_Lin = b
+print("The current bandwidth for linear component is "+ str(b) + ".\n")
+
+# Set up a set of mesh points and estimate the density values on it
+nrows, ncols = (100, 100)
+ang_qry = np.linspace(-np.pi-0.1, np.pi+0.1, nrows)
+lin_qry = np.linspace(-2, 5.5, ncols)
+ang_m1, lin_m1 = np.meshgrid(ang_qry, lin_qry)
+X = np.cos(ang_m1.reshape(-1,1))
+Y = np.sin(ang_m1.reshape(-1,1))
+mesh1 = np.concatenate([X.reshape(-1,1), Y.reshape(-1,1), 
+                        lin_m1.reshape(-1,1)], axis=1)
+d_DirLin = DirLinProdKDE(mesh1, data=vMF_Gau_data, h=[bw_Dir, bw_Lin], 
+                         com_type=['Dir','Lin'], dim=[1,1]).reshape(nrows, ncols)
+
+# below 5% density quantile
+d_DirLin_dat = DirLinProdKDE(vMF_Gau_data, vMF_Gau_data, h=[bw_Dir, bw_Lin], 
+                             com_type=['Dir','Lin'], dim=[1,1])
+vMF_Gau_data_thres = vMF_Gau_data[d_DirLin_dat > np.quantile(d_DirLin_dat, 0.05)]
+
+# Mode-seeking on the denoised data with our proposed mean shift algorithm
+DLMS_path = DirLinProdMS(vMF_Gau_data, vMF_Gau_data_thres, h=[bw_Dir, bw_Lin], com_type=['Dir','Lin'], 
+                         dim=[1,1], eps=1e-7, max_iter=3000)
+
+## Simulation 2: Ridge-finding on a directional-linear space $\Omega_1 \times \mathbb{R}$
+N = 1000
+sigma = 0.3
+np.random.seed(123)  ## Set an arbitrary seed for reproducibility
+# Simulated a curve with additive Gaussian noises on a cylinder (directional-linear case)
+t = np.random.rand(N)*2*np.pi - np.pi
+t_p = t + np.random.randn(1000) * sigma
+X_p = np.cos(t_p)
+Y_p = np.sin(t_p)
+Z_p = t/2 + np.random.randn(1000) * sigma
+cur_dat = np.concatenate([X_p.reshape(-1,1), Y_p.reshape(-1,1), 
+                          Z_p.reshape(-1,1)], axis=1)
+# Use the default bandwidths
+bw_Dir = None
+bw_Lin = None
+
+# Create a set of mesh points and estimate the density value on it
+nrows, ncols = (100, 100)
+ang_qry = np.linspace(-np.pi, np.pi, nrows)
+lin_qry = np.linspace(-2.5, 2.5, ncols)
+ang_m2, lin_m2 = np.meshgrid(ang_qry, lin_qry)
+X = np.cos(ang_m2.reshape(-1,1))
+Y = np.sin(ang_m2.reshape(-1,1))
+qry_pts = np.concatenate((X.reshape(-1,1), 
+                          Y.reshape(-1,1), 
+                          lin_m2.reshape(-1,1)), axis=1)
+d_DirLinProd = DirLinProdKDE(qry_pts, cur_dat, h=[bw_Dir, bw_Lin], 
+                             com_type=['Dir','Lin'], dim=[1,1]).reshape(ncols, nrows)
+
+# Proposed SCMS algorithm with our rule-of-thumb step size eta=h1*h2
+ProdSCMS_DL_p, lab_DL_p = DirLinProdSCMSLog(cur_dat, cur_dat, d=1, h=[bw_Dir,bw_Lin], 
+                                            com_type=['Dir','Lin'], dim=[1,1], 
+                                            eps=1e-7, max_iter=5000, eta=None)
+
+## Plotting the results
+fig = plt.figure(figsize=(16,10))
+# Create a cylinder for the directional-linear space
+theta = np.linspace(-np.pi, np.pi, 100)
+z = np.linspace(-2, 5, 100)
+th_m, Zc = np.meshgrid(theta, z)
+Xc = np.cos(th_m)
+Yc = np.sin(th_m)
+# Plot the simulated data points and local modes on the cylinder
+step = DLMS_path.shape[2] - 1
+Modes_angs = np.arctan2(DLMS_path[:,1,step], DLMS_path[:,0,step])
+ax = fig.add_subplot(221, projection='3d')
+ax.view_init(30, 60)
+ax.plot_surface(Xc, Yc, Zc, alpha=0.2, color='grey')
+ax.scatter(vMF_Gau_data[:,0], vMF_Gau_data[:,1], vMF_Gau_data[:,2], 
+           alpha=0.2, color='deepskyblue')
+ax.scatter(DLMS_path[:,0,step], DLMS_path[:,1,step], DLMS_path[:,2,step], 
+           color='red', s=40)
+ax.axis('off')
+plt.title('Simulated vMF-Gaussian mixture data and local modes \n estimated '\
+          'by our mean shift algorithm on a cylinder')
+
+# Plot the local modes on the contour plot of the estimated density
+step = DLMS_path.shape[2] - 1
+Modes_angs = np.arctan2(DLMS_path[:,1,step], DLMS_path[:,0,step])
+plt.subplot(222)
+plt.scatter(Angs, vMF_Gau_data[:,2], alpha=1)
+plt.contourf(ang_m1, lin_m1, d_DirLin, 10, cmap='OrRd', alpha=0.7)
+plt.colorbar()
+plt.scatter(Modes_angs, DLMS_path[:,2,step], color='red', s=40)
+plt.title('Estimated local modes on the contour plot of KDE')
+
+# Plot the simulated data and estimated ridge on a cylinder
+step_DL_p = ProdSCMS_DL_p.shape[2] - 1
+ax = fig.add_subplot(223, projection='3d')
+ax.view_init(30, 10)
+## Mesh points on the cylinder
+theta = np.linspace(-np.pi, np.pi, 100)
+z = np.linspace(-2, 2, 100)
+th_m, Zc = np.meshgrid(theta, z)
+Xc = np.cos(th_m)
+Yc = np.sin(th_m)
+## True curve structure
+t = np.linspace(-np.pi, np.pi, 200)
+X_cur = np.cos(t)
+Y_cur = np.sin(t)
+Z_cur = t/2
+ax.plot_surface(Xc, Yc, Zc, alpha=0.2)
+ax.plot(X_cur, Y_cur, Z_cur, linewidth=5, color='green')
+ax.scatter(ProdSCMS_DL_p[:,0,step_DL_p], ProdSCMS_DL_p[:,1,step_DL_p], 
+           ProdSCMS_DL_p[:,2,step_DL_p], alpha=0.5, color='deepskyblue')
+ax.axis('off')
+plt.title('Simulated data and density ridges \n estimated '\
+          'by our SCMS algorithm on a cylinder')
+
+# Plot the estimated ridge on the contour plot of estimated density
+plt.subplot(224)
+plt.contourf(ang_m2, lin_m2, d_DirLinProd, 10, cmap='OrRd', alpha=0.5)
+plt.colorbar()
+Ridges_angs_p = np.arctan2(ProdSCMS_DL_p[:,1,step_DL_p], 
+                           ProdSCMS_DL_p[:,0,step_DL_p])
+plt.scatter(Ridges_angs_p, ProdSCMS_DL_p[:,2,step_DL_p], color='deepskyblue', alpha=0.6)
+plt.xlabel('Directional Coordinate')
+plt.ylabel('Linear Coordinate')
+plt.title('Estimated density ridges on the contour plot of KDE')
+fig.tight_layout()
+fig.savefig('./Figures/DirLin_example.png')
+```
+
 
 
 ### Additional References
