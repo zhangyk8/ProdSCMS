@@ -1,7 +1,7 @@
 ## (Subspace Constrained) Mean Shift Algorithms in Euclidean and/or Directional Product Spaces
 This repository contains Python3 code for the mean shift and subspace constrained mean shift (SCMS) algorithms in any Euclidean and/or directional (Cartesian) product space.
 
-- Paper Reference: [Mode and Ridge Estimation in Euclidean and Directional Product Spaces: A Mean Shift Approach]() (2021)
+- Paper Reference: [Mode and Ridge Estimation in Euclidean and Directional Product Spaces: A Mean Shift Approach](https://arxiv.org/abs/2110.08505) (2021)
 
 ### Requirements
 
