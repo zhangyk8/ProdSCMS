@@ -6,7 +6,7 @@
 Last Editing: Oct 9, 2021
 
 Description: This script simulates a circular-circular dataset and plot its 
-points on a unit sphere and torus, respectively. (Figure 2 in the arxiv version 
+points on a unit sphere and torus, respectively. (Figure 1 in the arxiv version 
 of the paper).
 """
 
@@ -68,3 +68,33 @@ if __name__ == "__main__":
     
     print("Save the plots as 'torus_curve.pdf' and 'sphere_curve.pdf' "\
           "to the folder 'Figures'.\n\n")
+    
+    # Combine two plots on a single figure
+    fig = plt.figure(figsize=(12,6))
+    ax = fig.add_subplot(121, projection='3d')
+    u, v = np.mgrid[0:2 * np.pi:100j, 0:np.pi:50j]
+    x = np.cos(u) * np.sin(v)
+    y = np.sin(u) * np.sin(v)
+    z = np.cos(v)
+    x_p = np.cos(cir_dat[:,1]) * np.cos(cir_dat[:,0])
+    y_p = np.cos(cir_dat[:,1]) * np.sin(cir_dat[:,0])
+    z_p = np.sin(cir_dat[:,1])
+    ax.plot_wireframe(x, y, z, color='grey', alpha=0.3)
+    ax.scatter(x_p, y_p, z_p, color='red')
+    ax.axis('off')
+    
+    ax = fig.add_subplot(122, projection='3d')
+    c, a = 3, 1
+    x = (c + a*np.cos(phi_m)) * np.cos(th_m)
+    y = (c + a*np.cos(phi_m)) * np.sin(th_m)
+    z = a * np.sin(phi_m)
+    x_p = (c + a*np.cos(cir_dat[:,1])) * np.cos(cir_dat[:,0])
+    y_p = (c + a*np.cos(cir_dat[:,1])) * np.sin(cir_dat[:,0])
+    z_p = a * np.sin(cir_dat[:,1])
+    ax.set_zlim(-2.5,2.5)
+    ax.view_init(30, 120)
+    ax.plot_wireframe(x, y, z, color='grey', alpha=0.3)
+    ax.scatter(x_p, y_p, z_p, color='red')
+    ax.axis('off')
+    fig.tight_layout()
+    fig.savefig('./Figures/curve_sph_torus.png')
