@@ -16,14 +16,14 @@ This repository contains Python3 code for the mean shift and subspace constraine
 Some high-level descriptions of our Python scripts are as follows:
 
 - **Cosmic Filament Detection with Directional-Linear SCMS Algorithm (An Example).ipynb**: This Jupyter Notebook contains detailed code and descriptions about how we process the SDSS-IV galaxy data (Ahumada et al., 2020) and detect cosmic filaments on them with our proposed SCMS algorithm in the directional-linear \[(RA,DEC)*Redshift\] product space.
-- **Curves_Sphere_Torus.py**: This script simulates a circular-circular dataset and plot its points on a unit sphere and torus, respectively. (Figure 2 in the arxiv version of the paper).
+- **Curves_Sphere_Torus.py**: This script simulates a circular-circular dataset and plot its points on a unit sphere and torus, respectively. (Figure 1 in the arxiv version of the paper).
 - **DirLinProdSCMS_Ray.py**: This script implements the functions of KDE, component-wise/simultaneous mean shift, and subspace constrained mean shift (SCMS) algorithms with the Gaussian/von Mises product kernels in a directional/linear (mixture) product space using the parallel programming under the "Ray" environment.
 - **DirLinProdSCMS_fun.py**: This script implements the functions of KDE, component-wise/simultaneous mean shift, and subspace constrained mean shift (SCMS) algorithms with the Gaussian/von Mises product kernels in a directional/linear (mixture) product space.
 - **Earthquake_Modes.py**: This script contains code for applying our proposed mean shift algorithm to an Earthquake dataset (directional-linear data) (Figure 5 in the arxiv version of the paper). This script take more than 35 minutes to run on my laptop with 8 CPU cores.
 - **MS_SCMS_Ray.py**: This script contains code for the parallel implementations of regular Euclidean/directional mean shift and SCMS algorithms.
 - **Mode_Seeking_Examples.py**: This script contains code for mode-seeking simulation studies with our proposed mean shift algorithm (Figure 3 in the arxiv version of the paper).
 - **Spherical_Cone.py**: This script contains code for comparing the results of the regular SCMS and our proposed SCMS algorithms on the simulated spherical cone data (Figure 4 in the arxiv version of the paper).
-- **Spiral_Curve.py**: This script contains code for comparing the results of the regular SCMS and our proposed SCMS algorithms on the simulated spiral curve data. (Figure 1 in the arxiv version of the paper).
+- **Spiral_Curve.py**: This script contains code for comparing the results of the regular SCMS and our proposed SCMS algorithms on the simulated spiral curve data. (Figure 2 in the arxiv version of the paper).
 - **Utility_fun.py**: This script contains all the utility functions for our experiments.
 - **Varying_Stepsize.py**: This script contains code for investigating the effects of varying the stepsize parameter in our proposed SCMS algorithm in Euclidean/directional product spaces. (Figures 9 and 10 in the arxiv version of the paper). The script takes more than 1.5 hours to execute due to the slow convergence of the proposed SCMS algorithm with step size "eta=1". The SCMS algorithm with our suggested choice of the step size parameter, however, does converge very fast.
 
