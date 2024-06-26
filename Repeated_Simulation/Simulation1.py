@@ -6,7 +6,7 @@
 Last Editing: June 25, 2024
 
 Description: This script contains code for mode-seeking simulation studies with
-our proposed mean shift algorithm (Figure 3 in the arxiv version of the paper).
+our proposed mean shift algorithm (Simulation 1 in the paper).
 """
 
 import numpy as np
@@ -124,7 +124,7 @@ print('The Hausdorff distance between the estimated and true modes for the Eucli
 avg_EuMS = np.mean(Eu_to_true)
 
 
-## Method (ii): directional mean shift algorithm on Omega_1 and the Euclidean mean shift algorithm on R independently
+## Method (ii): directional mean shift algorithm on \Omega_1 and the Euclidean mean shift algorithm on R independently
 d_Dir_dat2 = DirKDE(vMF_Gau_data[:,:2], vMF_Gau_data[:,:2], h=None)
 vMF_data_thres = vMF_Gau_data[d_Dir_dat2 > np.quantile(d_Dir_dat2, 0.05),:2]
 d_Eu_dat2 = KDE(vMF_Gau_data[:,2].reshape(-1,1), vMF_Gau_data[:,2].reshape(-1,1), h=None)
@@ -136,7 +136,11 @@ EuMS_path2 = MS_KDE(Gau_data_thres.reshape(-1,1), data=vMF_Gau_data[:,2].reshape
 Dir_mode2, lab_Dir2 = Unique_Modes(DirMS_path2[:,:,DirMS_path2.shape[2]-1], tol=1e-3)
 Eu_mode2, lab_Eu2 = Unique_Modes(EuMS_path2[:,:,EuMS_path2.shape[2]-1], tol=1e-3)
 print(Eu_mode2)
-DirEu_mode = np.concatenate([Dir_mode2, Eu_mode2*np.ones([3,1])], axis=1)
+
+# Enumerate all possible mode combinations
+Dir_mode2a = np.tile(Dir_mode2, (len(Eu_mode2),1))
+DirEu_mode = np.concatenate([Dir_mode2a, np.repeat(Eu_mode2, len(Dir_mode2)).reshape(-1,1)], axis=1)
+print(DirEu_mode)
 print(DirEu_mode)
 
 DirEu_to_true = pd.DataFrame(DirEu_mode).apply(lambda x: CompDist(x, ref_dat=true_mode), axis=1)
