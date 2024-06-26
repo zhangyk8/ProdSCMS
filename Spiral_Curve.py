@@ -7,7 +7,7 @@ Last Editing: Oct 10, 2021
 
 Description: This script contains code for comparing the results of the regular 
 SCMS and our proposed SCMS algorithms on the simulated spiral curve data. 
-(Figure 1 in the arxiv version of the paper).
+(Figure 2 in the arxiv version of the paper).
 """
 
 import numpy as np
