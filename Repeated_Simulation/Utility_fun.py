@@ -3,7 +3,7 @@
 """
 @author: Yikun Zhang
 
-Last Editing: Oct 10, 2021
+Last Editing: January 26, 2025
 
 Description: This script contains all the utility functions for our experiments.
 """
@@ -220,7 +220,6 @@ def Unique_Modes(can_modes, tol=1e-4):
         2) A (N, ) array with integer labels specifying the affiliation of each mesh point.
 '''
     n_modes = can_modes.shape[0]   ## The number of candidate modes
-    d = can_modes.shape[1]    ## The dimension of (candidate) modes
     modes_ind = [0]   ## Candidate list of unique modes
     labels = np.empty([n_modes, ], dtype=int)
     labels[0] = 0
@@ -282,3 +281,53 @@ def RandomPtsCone(N, semi_open_ang, zmin=0, zmax=2, pv_ax=np.array([0,0,1])):
         np.sum((mu_c+pv_ax.reshape(1,3))**2, axis=1) - np.identity(3)
     rand_pts = np.dot(R, rand_pts.T).T
     return rand_pts
+
+
+def BiVonMisesSampling(N, mu1=0, mu2=0, kappa1=10, kappa2=10, A=np.eye(2)):
+    '''
+    Randomly sampling data points from a bivariate von Mises distribution
+    
+    Parameters:
+        N: int
+            The number of randomly sampled data points.
+        
+        mu1, mu2: float
+            The means of the bivariate von Mises distribution.
+            
+        kappa1, kappa2: float
+            The concentration parameters of the bivariate von Mises distribution.
+        
+        A: (2, 2)-array
+            A matrix related to the correlation.
+    
+    Return:
+        data_ps: (n, d)-array
+            The randomly sampled points from the bivariate von Mises distribution.
+    '''
+    data_ps = np.zeros((N,2))
+    ## Sampling points uniformly from [-pi,pi]*[-pi,pi]
+    sam_can = np.random.rand(N, 2)*2*np.pi - np.pi
+    sam_can_cent1 = np.concatenate([np.cos(sam_can[:,0] - mu1).reshape(-1,1), 
+                                    np.sin(sam_can[:,0] - mu2).reshape(-1,1)], axis=1)
+    sam_can_cent2 = np.concatenate([np.cos(sam_can[:,1] - mu1).reshape(-1,1), 
+                                    np.sin(sam_can[:,1] - mu2).reshape(-1,1)], axis=1)
+    cor_mat = np.diag(np.dot(np.dot(sam_can_cent1, A), sam_can_cent2.T))
+    # Rejection criteria
+    M = np.exp(kappa1*np.cos(sam_can[:,0] - mu1) + kappa2*np.cos(sam_can[:,1] - mu2) + cor_mat) \
+       / np.exp(kappa1 + kappa2 + 2*np.max(A))
+    unif_sam = np.random.uniform(0, 1, N)
+    sams = sam_can[unif_sam < M,:]
+    cnt = sams.shape[0]
+    data_ps[:cnt,:] = sams
+    while cnt < N:
+        can_p = np.random.rand(2)*2*np.pi - np.pi
+        sam_p_cent1 = np.array([np.cos(can_p[0] - mu1), np.sin(can_p[0] - mu2)])
+        sam_p_cent2 = np.array([np.cos(can_p[1] - mu1), np.sin(can_p[1] - mu2)]).reshape(2,1)
+        cor = np.dot(np.dot(sam_p_cent1, A), sam_p_cent2)
+        M = np.exp(kappa1*np.cos(can_p[0] - mu1) + kappa2*np.cos(can_p[1] - mu2) + cor) \
+           / np.exp(kappa1 + kappa2 + 2*np.max(A))
+        unif_p = np.random.uniform(0, 1, 1)
+        if unif_p < M:
+            data_ps[cnt,:] = can_p
+            cnt += 1
+    return data_ps
