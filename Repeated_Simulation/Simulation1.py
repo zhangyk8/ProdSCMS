@@ -16,7 +16,7 @@ import sys
 import pickle
 from numpy import linalg as LA
 from DirLinProdSCMS_fun import DirLinProdKDE, DirLinProdMS, DirLinProdMSCompAsc
-from Utility_fun import vMF_Gauss_mix, Unique_Modes
+from Utility_fun import vMF_Gauss_mix, Unique_Modes, LSCV_BW
 
 from SCMS_fun import KDE, MS_KDE
 from DirSCMS_fun import DirKDE, MS_DirKDE
@@ -30,7 +30,7 @@ print(job_id)
 def CompDist(x, ref_dat):
     return np.min(LA.norm(ref_dat - x.values, axis=1))
 
-for N in [500, 1000, 2000, 5000]:
+for N in [500, 1000, 2000]:
     ## Simulation 1: Mode-seeking on a directional-linear space $\Omega_1 \times \mathbb{R}$
     np.random.seed(job_id)  ## Set an arbitrary seed for reproducibility
     prob1 = [2/5, 1/5, 2/5]   ## Mixture probabilities
@@ -111,7 +111,48 @@ for N in [500, 1000, 2000, 5000]:
     print('The Hausdorff distance between the estimated and true modes for the simulaneous MS algorithm is '\
           +str(max([max(DL1_to_true), max(true_to_DL1)])))
     avg_DirLinMS = np.mean(DL1_to_true)
+    
+    
+    # LSCV Bandwidth selection
+    bw_Dir, bw_Lin = LSCV_BW(vMF_Gau_data, com_type=['Dir', 'Lin'], dim=[1,1], 
+                                   h1_range=None, h2_range=None)
+    print("The current bandwidth for directional component is " + str(bw_Dir) + ".\n")
+    print("The current bandwidth for linear component is "+ str(bw_Lin) + ".\n")
+    
+    d_DirLin = DirLinProdKDE(mesh1, data=vMF_Gau_data, h=[bw_Dir, bw_Lin], 
+                             com_type=['Dir','Lin'], dim=[1,1]).reshape(nrows, ncols)
+    # Estimate the density values on the simulated data and remove data points
+    # below 5% density quantile
+    d_DirLin_dat = DirLinProdKDE(vMF_Gau_data, vMF_Gau_data, h=[bw_Dir, bw_Lin], 
+                                 com_type=['Dir','Lin'], dim=[1,1])
+    vMF_Gau_data_thres = vMF_Gau_data[d_DirLin_dat > np.quantile(d_DirLin_dat, 0.05)]
 
+    # Mode-seeking on the denoised data with our proposed mean shift algorithm
+    DLMS_path = DirLinProdMS(vMF_Gau_data, vMF_Gau_data_thres, h=[bw_Dir, bw_Lin], 
+                             com_type=['Dir','Lin'], dim=[1,1], eps=1e-7, 
+                             max_iter=3000)
+    DLMS_path2 = DirLinProdMSCompAsc(vMF_Gau_data, vMF_Gau_data_thres, 
+                                     h=[bw_Dir, bw_Lin], com_type=['Dir','Lin'], 
+                                     dim=[1,1], eps=1e-7, max_iter=3000)
+    DL_mode1, lab1 = Unique_Modes(DLMS_path[:,:,DLMS_path.shape[2]-1], tol=1e-3)
+    DL_mode2, lab2 = Unique_Modes(DLMS_path2[:,:,DLMS_path2.shape[2]-1], tol=1e-3)
+    print('\n The Euclidean norms between the local modes obtained by Version A '\
+          'and B on the simulated directional-linear data are')
+    
+    try:
+        print(LA.norm(DL_mode1 - DL_mode2, axis=1))
+    except:
+        print('\n The numbers of local modes obtained by Version A and B are not identical!')
+    
+    print('\n The local modes obtained by our proposed mean shift algorithm are ')
+    print(DL_mode1)
+
+    DL1_to_true = pd.DataFrame(DL_mode1).apply(lambda x: CompDist(x, ref_dat=true_mode), axis=1)
+    true_to_DL1 = pd.DataFrame(true_mode).apply(lambda x: CompDist(x, ref_dat=DL_mode1), axis=1)
+    print('The Hausdorff distance between the estimated and true modes for the simulaneous MS algorithm is '\
+          +str(max([max(DL1_to_true), max(true_to_DL1)])))
+    avg_DirLinMS2 = np.mean(DL1_to_true)
+    
 
     ## Method (i): standard Euclidean mean shift on R^3
     d_Eu_dat = KDE(vMF_Gau_data, vMF_Gau_data, h=None)
@@ -153,6 +194,7 @@ for N in [500, 1000, 2000, 5000]:
     print('The Hausdorff distance between the estimated and true modes by applying Euclidean'\
           ' and directional MS algorithms separately is '+str(max([max(DirEu_to_true), max(true_to_DirEu)])))
     avg_EuDir = np.mean(DirEu_to_true)
-
+    
+    
     with open('./Results/Simulation1_N_'+str(N)+'_'+str(job_id)+'.dat', "wb") as file:
-        pickle.dump([avg_EuMS, avg_EuDir, avg_DirLinMS], file)
+        pickle.dump([avg_EuMS, avg_EuDir, avg_DirLinMS, avg_DirLinMS2], file)

@@ -3,13 +3,15 @@
 """
 @author: Yikun Zhang
 
-Last Editing: January 26, 2025
+Last Editing: January 27, 2025
 
 Description: This script contains all the utility functions for our experiments.
 """
 
 import numpy as np
 import scipy.special as sp
+from itertools import product
+from sklearn.metrics.pairwise import pairwise_distances
 
 
 ## Converting Euclidean coordinates to Spherical coordinate and vice versa
@@ -331,3 +333,105 @@ def BiVonMisesSampling(N, mu1=0, mu2=0, kappa1=10, kappa2=10, A=np.eye(2)):
             data_ps[cnt,:] = can_p
             cnt += 1
     return data_ps
+
+
+def vMF_const(kappa=1, q=1):
+    return kappa**((q-1)/2) / ((2*np.pi)**((q+1)/2)* sp.iv((q-1)/2, kappa))
+
+
+def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h1_range=None, h2_range=None):
+    n = data.shape[0]  ## Number of data points
+    D_t = data.shape[1]  ## Total dimension of the data
+    
+    com_type = np.array(com_type)  ## Convert the list object "com_type" to a numpy array
+    assert len(dim) == len(com_type), "The lengths of data type argument 'com_type'"\
+    " and dimension argument 'dim' should be the same."
+    
+    assert sum(dim)+sum(com_type=='Dir') == D_t, "The dimension of the input data, "\
+    +str(D_t)+", should be equal to the sum of the Euclidean dimension of the "\
+    "directional components ("+str(sum(dim)+sum(com_type=='Dir'))+")."
+    
+    
+    data_comp = []
+    Eu_dim = []
+    for k in range(len(dim)):
+        if (k == 0) and (com_type[k] == 'Dir'):
+            data_comp.append(data[:,:(dim[k]+1)])
+            Eu_dim.append(dim[k]+1)
+        elif (k == 0) and (com_type[k] == 'Lin'):
+            data_comp.append(data[:,:dim[k]])
+            Eu_dim.append(dim[k])
+        elif com_type[k] == 'Dir':
+            data_comp.append(data[:,sum(Eu_dim):(sum(Eu_dim)+dim[k]+1)])
+            Eu_dim.append(dim[k]+1)
+        else:
+            data_comp.append(data[:,sum(Eu_dim):(sum(Eu_dim)+dim[k])])
+            Eu_dim.append(dim[k])
+    
+    h = [h1_range, h2_range]
+    h_rot = []
+    # Select the candidate bandwidth range using h_{ROT}*np.logspace(-1,1,20)
+    for k in range(len(h)):
+        if (h[k] is None) and (com_type[k] == 'Dir'):
+            R_bar = np.sqrt(sum(np.mean(data_comp[k], axis=0) ** 2))
+            ## An approximation to kappa (Banerjee 2005 & Sra, 2011)
+            kap_hat = R_bar * (dim[k] + 1 - R_bar ** 2) / (1 - R_bar ** 2)
+            if dim[k] == 2:
+                h[k] = (8*np.sinh(kap_hat)**2/(n*kap_hat * \
+                 ((1+4*kap_hat**2)*np.sinh(2*kap_hat) - 2*kap_hat*np.cosh(2*kap_hat))))**(1/6)
+            else:
+                h[k] = ((4 * np.sqrt(np.pi) * sp.iv((dim[k]-1) / 2 , kap_hat)**2) / \
+                 (n * kap_hat ** ((dim[k]+1) / 2) * (2 * dim[k] * sp.iv((dim[k]+1)/2, 2*kap_hat) + \
+                    (dim[k]+2) * kap_hat * sp.iv((dim[k]+3)/2, 2*kap_hat)))) ** (1/(dim[k] + 4))
+            print("The current bandwidth for the "+str(k)+"-th directional component is "\
+                + str(h[k]) + ".\n")
+        elif (h[k] is None) and (com_type[k] == 'Lin'):
+            # Apply Silverman's rule of thumb to select the bandwidth parameter 
+            # (Only works for Gaussian kernel)
+            h[k] = (4/(dim[k]+2))**(1/(dim[k]+4))*(n**(-1/(dim[k]+4)))\
+                *np.mean(np.std(data_comp[k], axis=0))
+            print("The current bandwidth for the "+str(k)+"-th linear component is "\
+                  + str(h[k]) + ".\n")
+        
+        h_rot.append(h[k])
+        h[k] = h[k]*np.logspace(0, 1, 10)
+        
+    h_can = list(product(*h))
+    LSCV_loss = []
+    
+    for h in h_can:
+        # Compute three terms in the LSCV loss separately and add them up
+        term1, term2, term3 = 0, 0, 0
+        for k in range(len(dim)):
+            if k == 0:
+                term1 = 1/n
+                term2 = np.ones((n, n, len(dim)))/(n**2)
+                term3 = 2*np.ones((n, n, len(dim)))/(n*(n-1))
+            # Compute the squared pairwise distances between data points in this component
+            p_dist = pairwise_distances(data_comp[k], metric='sqeuclidean')
+            if com_type[k] == 'Dir':
+                term1 *= (vMF_const(kappa=1/(h[k]**2), q=dim[k])**2) / vMF_const(kappa=2/(h[k]**2), q=dim[k])
+                
+                dir_term2 = (vMF_const(kappa=1/(h[k]**2), q=dim[k])**2) / vMF_const(kappa=np.sqrt(4 - p_dist)/(h[k]**2), q=dim[k])
+                np.fill_diagonal(dir_term2, 0)
+                term2[:,:,k] = term2[:,:,k] * dir_term2
+                
+                dir_term3 = vMF_const(kappa=1/(h[k]**2), q=dim[k]) * np.exp((2 - p_dist)/(2*(h[k]**2)))
+                np.fill_diagonal(dir_term3, 0)
+                term3[:,:,k] = term3[:,:,k] * dir_term3
+            elif com_type[k] == 'Lin':
+                term1 *= 1/((2**dim[k]) * np.pi**(dim[k]/2) * (h[k]**dim[k]))
+                
+                eu_term2 = np.exp(-p_dist/(4*(h[k]**2))) / (2**dim[k] * np.pi**(dim[k]/2))
+                np.fill_diagonal(eu_term2, 0)
+                term2[:,:,k] = term2[:,:,k] * eu_term2
+                
+                eu_term3 = np.exp(-p_dist/(2*(h[k]**2))) / ((2*np.pi)**(dim[k]/2) * (h[k]**dim[k]))
+                np.fill_diagonal(eu_term3, 0)
+                term3[:,:,k] = term3[:,:,k] * eu_term3
+                
+        LSCV_loss.append(term1 + np.sum(term2) - np.sum(term3))
+    
+    if np.isnan(LSCV_loss).all():
+        return h_rot
+    return h_can[np.nanargmin(LSCV_loss)]

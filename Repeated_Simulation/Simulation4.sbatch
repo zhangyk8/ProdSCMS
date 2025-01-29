@@ -6,8 +6,8 @@
 #SBATCH --exclusive
 #1 task per node is supposed to ensure that each ray worker runtime will be on a separate node:
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=48
-#SBATCH --mem-per-cpu=2000           # Memory limit for each tasks (in MB)
+#SBATCH --cpus-per-task=36
+#SBATCH --mem-per-cpu=5000           # Memory limit for each tasks (in MB)
 #SBATCH --tasks-per-node=1
 #SBATCH -o out/sim4.out        # File to which STDOUT will be written
 #SBATCH -e out/sim4.err        # File to which STDERR will be written
@@ -23,8 +23,7 @@ nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 nodes_array=($nodes)
 
 head_node=${nodes_array[0]}
-head_node_ip=$(srun --partition=${SLURM_JOB_PARTITION} --nodes=1 --ntasks=
-1 -w "$head_node" hostname --ip-address)
+head_node_ip=$(srun --partition=${SLURM_JOB_PARTITION} --nodes=1 --ntasks=1 -w "$head_node" hostname --ip-address)
 
 # if we detect a space character in the head node IP, we'll
 # convert it to an ipv4 address. This step is optional.
