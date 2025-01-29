@@ -339,7 +339,42 @@ def vMF_const(kappa=1, q=1):
     return kappa**((q-1)/2) / ((2*np.pi)**((q+1)/2)* sp.iv((q-1)/2, kappa))
 
 
-def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h1_range=None, h2_range=None):
+def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h_range=[None,None]):
+    '''
+    Least square cross validation (LSCV) bandwidth selection for kernel density 
+    estimator with the von Mises/Gaussian product kernels in a directional/linear 
+    (mixture) product space.
+    
+    Parameters:
+        data: (n, sum(dim)+sum(com_type=='Dir'))-array
+            Euclidean coordinates of n random sample points in the product space, 
+            where (dim[0]+1) / dim[0] is the Euclidean dimension of a 
+            directional/linear component (first (dim[0]+1) columns), and so on.
+            
+        com_type: list of strings
+            Indicators of the data type for all the components. If com_type[k]='Dir',
+            then the corresponding component is directional. If com_type[k]='Lin', 
+            then the corresponding component is linear.
+            
+        dim: list of ints
+            Intrinsic data dimensions of all the directional/linear components.
+            
+        h_range: list of floats
+            Bandwidth parameters for all the components. (Default: h=[None]*K, 
+            where K is the number of components in the product space. Whenever
+            h[k]=None for some k=1,...,K, then a rule of thumb for directional 
+            KDE with the von Mises kernel in Garcia-Portugues (2013) is applied 
+            to that directional component or the Silverman's rule of thumb is 
+            applied to that linear component; see Chen et al.(2016) for details.
+            Finally, these rule-of-thumb bandwidths will be multiplied by 
+            "np.logspace(-1, 1, 10)", and their Cartesian products will be the 
+            final candidate bandwidths for cross validation.)
+    
+    Return:
+        bw: list of d floats
+            The LSCV selected bandwidths for each component of the 
+            directional/linear (mixture) product space.
+    '''
     n = data.shape[0]  ## Number of data points
     D_t = data.shape[1]  ## Total dimension of the data
     
@@ -368,7 +403,7 @@ def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h1_range=None, h2_range=No
             data_comp.append(data[:,sum(Eu_dim):(sum(Eu_dim)+dim[k])])
             Eu_dim.append(dim[k])
     
-    h = [h1_range, h2_range]
+    h = h_range
     h_rot = []
     # Select the candidate bandwidth range using h_{ROT}*np.logspace(-1,1,20)
     for k in range(len(h)):
@@ -394,7 +429,7 @@ def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h1_range=None, h2_range=No
                   + str(h[k]) + ".\n")
         
         h_rot.append(h[k])
-        h[k] = h[k]*np.logspace(0, 1, 10)
+        h[k] = h[k]*np.logspace(-1, 1, 10)
         
     h_can = list(product(*h))
     LSCV_loss = []
