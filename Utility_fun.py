@@ -3,13 +3,15 @@
 """
 @author: Yikun Zhang
 
-Last Editing: Oct 10, 2021
+Last Editing: January 27, 2025
 
 Description: This script contains all the utility functions for our experiments.
 """
 
 import numpy as np
 import scipy.special as sp
+from itertools import product
+from sklearn.metrics.pairwise import pairwise_distances
 
 
 ## Converting Euclidean coordinates to Spherical coordinate and vice versa
@@ -220,7 +222,6 @@ def Unique_Modes(can_modes, tol=1e-4):
         2) A (N, ) array with integer labels specifying the affiliation of each mesh point.
 '''
     n_modes = can_modes.shape[0]   ## The number of candidate modes
-    d = can_modes.shape[1]    ## The dimension of (candidate) modes
     modes_ind = [0]   ## Candidate list of unique modes
     labels = np.empty([n_modes, ], dtype=int)
     labels[0] = 0
@@ -282,3 +283,190 @@ def RandomPtsCone(N, semi_open_ang, zmin=0, zmax=2, pv_ax=np.array([0,0,1])):
         np.sum((mu_c+pv_ax.reshape(1,3))**2, axis=1) - np.identity(3)
     rand_pts = np.dot(R, rand_pts.T).T
     return rand_pts
+
+
+def BiVonMisesSampling(N, mu1=0, mu2=0, kappa1=10, kappa2=10, A=np.eye(2)):
+    '''
+    Randomly sampling data points from a bivariate von Mises distribution
+    
+    Parameters:
+        N: int
+            The number of randomly sampled data points.
+        
+        mu1, mu2: float
+            The means of the bivariate von Mises distribution.
+            
+        kappa1, kappa2: float
+            The concentration parameters of the bivariate von Mises distribution.
+        
+        A: (2, 2)-array
+            A matrix related to the correlation.
+    
+    Return:
+        data_ps: (n, d)-array
+            The randomly sampled points from the bivariate von Mises distribution.
+    '''
+    data_ps = np.zeros((N,2))
+    ## Sampling points uniformly from [-pi,pi]*[-pi,pi]
+    sam_can = np.random.rand(N, 2)*2*np.pi - np.pi
+    sam_can_cent1 = np.concatenate([np.cos(sam_can[:,0] - mu1).reshape(-1,1), 
+                                    np.sin(sam_can[:,0] - mu2).reshape(-1,1)], axis=1)
+    sam_can_cent2 = np.concatenate([np.cos(sam_can[:,1] - mu1).reshape(-1,1), 
+                                    np.sin(sam_can[:,1] - mu2).reshape(-1,1)], axis=1)
+    cor_mat = np.diag(np.dot(np.dot(sam_can_cent1, A), sam_can_cent2.T))
+    # Rejection criteria
+    M = np.exp(kappa1*np.cos(sam_can[:,0] - mu1) + kappa2*np.cos(sam_can[:,1] - mu2) + cor_mat) \
+       / np.exp(kappa1 + kappa2 + 2*np.max(A))
+    unif_sam = np.random.uniform(0, 1, N)
+    sams = sam_can[unif_sam < M,:]
+    cnt = sams.shape[0]
+    data_ps[:cnt,:] = sams
+    while cnt < N:
+        can_p = np.random.rand(2)*2*np.pi - np.pi
+        sam_p_cent1 = np.array([np.cos(can_p[0] - mu1), np.sin(can_p[0] - mu2)])
+        sam_p_cent2 = np.array([np.cos(can_p[1] - mu1), np.sin(can_p[1] - mu2)]).reshape(2,1)
+        cor = np.dot(np.dot(sam_p_cent1, A), sam_p_cent2)
+        M = np.exp(kappa1*np.cos(can_p[0] - mu1) + kappa2*np.cos(can_p[1] - mu2) + cor) \
+           / np.exp(kappa1 + kappa2 + 2*np.max(A))
+        unif_p = np.random.uniform(0, 1, 1)
+        if unif_p < M:
+            data_ps[cnt,:] = can_p
+            cnt += 1
+    return data_ps
+
+
+def vMF_const(kappa=1, q=1):
+    return kappa**((q-1)/2) / ((2*np.pi)**((q+1)/2)* sp.iv((q-1)/2, kappa))
+
+
+def LSCV_BW(data, com_type=['Dir', 'Lin'], dim=[2,1], h_range=[None,None]):
+    '''
+    Least square cross validation (LSCV) bandwidth selection for kernel density 
+    estimator with the von Mises/Gaussian product kernels in a directional/linear 
+    (mixture) product space.
+    
+    Parameters:
+        data: (n, sum(dim)+sum(com_type=='Dir'))-array
+            Euclidean coordinates of n random sample points in the product space, 
+            where (dim[0]+1) / dim[0] is the Euclidean dimension of a 
+            directional/linear component (first (dim[0]+1) columns), and so on.
+            
+        com_type: list of strings
+            Indicators of the data type for all the components. If com_type[k]='Dir',
+            then the corresponding component is directional. If com_type[k]='Lin', 
+            then the corresponding component is linear.
+            
+        dim: list of ints
+            Intrinsic data dimensions of all the directional/linear components.
+            
+        h_range: list of floats
+            Bandwidth parameters for all the components. (Default: h=[None]*K, 
+            where K is the number of components in the product space. Whenever
+            h[k]=None for some k=1,...,K, then a rule of thumb for directional 
+            KDE with the von Mises kernel in Garcia-Portugues (2013) is applied 
+            to that directional component or the Silverman's rule of thumb is 
+            applied to that linear component; see Chen et al.(2016) for details.
+            Finally, these rule-of-thumb bandwidths will be multiplied by 
+            "np.logspace(-1, 1, 10)", and their Cartesian products will be the 
+            final candidate bandwidths for cross validation.)
+    
+    Return:
+        bw: list of d floats
+            The LSCV selected bandwidths for each component of the 
+            directional/linear (mixture) product space.
+    '''
+    n = data.shape[0]  ## Number of data points
+    D_t = data.shape[1]  ## Total dimension of the data
+    
+    com_type = np.array(com_type)  ## Convert the list object "com_type" to a numpy array
+    assert len(dim) == len(com_type), "The lengths of data type argument 'com_type'"\
+    " and dimension argument 'dim' should be the same."
+    
+    assert sum(dim)+sum(com_type=='Dir') == D_t, "The dimension of the input data, "\
+    +str(D_t)+", should be equal to the sum of the Euclidean dimension of the "\
+    "directional components ("+str(sum(dim)+sum(com_type=='Dir'))+")."
+    
+    
+    data_comp = []
+    Eu_dim = []
+    for k in range(len(dim)):
+        if (k == 0) and (com_type[k] == 'Dir'):
+            data_comp.append(data[:,:(dim[k]+1)])
+            Eu_dim.append(dim[k]+1)
+        elif (k == 0) and (com_type[k] == 'Lin'):
+            data_comp.append(data[:,:dim[k]])
+            Eu_dim.append(dim[k])
+        elif com_type[k] == 'Dir':
+            data_comp.append(data[:,sum(Eu_dim):(sum(Eu_dim)+dim[k]+1)])
+            Eu_dim.append(dim[k]+1)
+        else:
+            data_comp.append(data[:,sum(Eu_dim):(sum(Eu_dim)+dim[k])])
+            Eu_dim.append(dim[k])
+    
+    h = h_range
+    h_rot = []
+    # Select the candidate bandwidth range using h_{ROT}*np.logspace(-1,1,20)
+    for k in range(len(h)):
+        if (h[k] is None) and (com_type[k] == 'Dir'):
+            R_bar = np.sqrt(sum(np.mean(data_comp[k], axis=0) ** 2))
+            ## An approximation to kappa (Banerjee 2005 & Sra, 2011)
+            kap_hat = R_bar * (dim[k] + 1 - R_bar ** 2) / (1 - R_bar ** 2)
+            if dim[k] == 2:
+                h[k] = (8*np.sinh(kap_hat)**2/(n*kap_hat * \
+                 ((1+4*kap_hat**2)*np.sinh(2*kap_hat) - 2*kap_hat*np.cosh(2*kap_hat))))**(1/6)
+            else:
+                h[k] = ((4 * np.sqrt(np.pi) * sp.iv((dim[k]-1) / 2 , kap_hat)**2) / \
+                 (n * kap_hat ** ((dim[k]+1) / 2) * (2 * dim[k] * sp.iv((dim[k]+1)/2, 2*kap_hat) + \
+                    (dim[k]+2) * kap_hat * sp.iv((dim[k]+3)/2, 2*kap_hat)))) ** (1/(dim[k] + 4))
+            print("The current bandwidth for the "+str(k)+"-th directional component is "\
+                + str(h[k]) + ".\n")
+        elif (h[k] is None) and (com_type[k] == 'Lin'):
+            # Apply Silverman's rule of thumb to select the bandwidth parameter 
+            # (Only works for Gaussian kernel)
+            h[k] = (4/(dim[k]+2))**(1/(dim[k]+4))*(n**(-1/(dim[k]+4)))\
+                *np.mean(np.std(data_comp[k], axis=0))
+            print("The current bandwidth for the "+str(k)+"-th linear component is "\
+                  + str(h[k]) + ".\n")
+        
+        h_rot.append(h[k])
+        h[k] = h[k]*np.logspace(-1, 1, 10)
+        
+    h_can = list(product(*h))
+    LSCV_loss = []
+    
+    for h in h_can:
+        # Compute three terms in the LSCV loss separately and add them up
+        term1, term2, term3 = 0, 0, 0
+        for k in range(len(dim)):
+            if k == 0:
+                term1 = 1/n
+                term2 = np.ones((n, n, len(dim)))/(n**2)
+                term3 = 2*np.ones((n, n, len(dim)))/(n*(n-1))
+            # Compute the squared pairwise distances between data points in this component
+            p_dist = pairwise_distances(data_comp[k], metric='sqeuclidean')
+            if com_type[k] == 'Dir':
+                term1 *= (vMF_const(kappa=1/(h[k]**2), q=dim[k])**2) / vMF_const(kappa=2/(h[k]**2), q=dim[k])
+                
+                dir_term2 = (vMF_const(kappa=1/(h[k]**2), q=dim[k])**2) / vMF_const(kappa=np.sqrt(4 - p_dist)/(h[k]**2), q=dim[k])
+                np.fill_diagonal(dir_term2, 0)
+                term2[:,:,k] = term2[:,:,k] * dir_term2
+                
+                dir_term3 = vMF_const(kappa=1/(h[k]**2), q=dim[k]) * np.exp((2 - p_dist)/(2*(h[k]**2)))
+                np.fill_diagonal(dir_term3, 0)
+                term3[:,:,k] = term3[:,:,k] * dir_term3
+            elif com_type[k] == 'Lin':
+                term1 *= 1/((2**dim[k]) * np.pi**(dim[k]/2) * (h[k]**dim[k]))
+                
+                eu_term2 = np.exp(-p_dist/(4*(h[k]**2))) / (2**dim[k] * np.pi**(dim[k]/2))
+                np.fill_diagonal(eu_term2, 0)
+                term2[:,:,k] = term2[:,:,k] * eu_term2
+                
+                eu_term3 = np.exp(-p_dist/(2*(h[k]**2))) / ((2*np.pi)**(dim[k]/2) * (h[k]**dim[k]))
+                np.fill_diagonal(eu_term3, 0)
+                term3[:,:,k] = term3[:,:,k] * eu_term3
+                
+        LSCV_loss.append(term1 + np.sum(term2) - np.sum(term3))
+    
+    if np.isnan(LSCV_loss).all():
+        return h_rot
+    return h_can[np.nanargmin(LSCV_loss)]
