@@ -29,7 +29,7 @@ from DirLinProdSCMS_Ray import DirLinProdSCMSLog_Fast
 def DistToCurve(x, true_cur):
     return min(LA.norm(x.values - true_cur, axis=1))
 
-for N in [500]:
+for N in [500, 1000, 2000]:
     for job_id in range(1, 1001):
         print("Current job id is "+str(job_id)+".\n\n\n")
         ## Simulation 3: Ridge-Finding on $\Omega_2 \times R$
@@ -128,31 +128,31 @@ for N in [500]:
         
         
         # LSCV Bandwidth selection
-        bw1, bw2 = LSCV_BW(cur_dat, com_type=['Dir', 'Lin'], dim=[2,1], 
-                                       h1_range=None, h2_range=None)
+        # bw1, bw2 = LSCV_BW(cur_dat, com_type=['Dir', 'Lin'], dim=[2,1], 
+        #                                h1_range=None, h2_range=None)
         
-        ray.init(include_dashboard=False)
-        mesh_0 = cur_dat
-        dataset = cur_dat
-        chunksize = 10
-        num_p = mesh_0.shape[0]
-        result_ids = []
-        for i in range(0, num_p, chunksize):
-            result_ids.append(DirLinProdSCMSLog_Fast.remote(mesh_0[i:(i+chunksize)], 
-                                                            dataset, d=1, h=[bw1, bw2], 
-                                                            com_type=['Dir','Lin'], 
-                                                            dim=[2,1], eps=1e-7, 
-                                                            max_iter=5000))
-        DLSCMS_pts = ray.get(result_ids)
-        DLSCMS_pts = np.concatenate(DLSCMS_pts, axis=0)
-        ray.shutdown()
+        # ray.init(include_dashboard=False)
+        # mesh_0 = cur_dat
+        # dataset = cur_dat
+        # chunksize = 10
+        # num_p = mesh_0.shape[0]
+        # result_ids = []
+        # for i in range(0, num_p, chunksize):
+        #     result_ids.append(DirLinProdSCMSLog_Fast.remote(mesh_0[i:(i+chunksize)], 
+        #                                                     dataset, d=1, h=[bw1, bw2], 
+        #                                                     com_type=['Dir','Lin'], 
+        #                                                     dim=[2,1], eps=1e-7, 
+        #                                                     max_iter=5000))
+        # DLSCMS_pts = ray.get(result_ids)
+        # DLSCMS_pts = np.concatenate(DLSCMS_pts, axis=0)
+        # ray.shutdown()
 
-        lon, lat, R = cart2sph(*DLSCMS_pts[:,:3].T)
-        Phi = (lon/180)*np.pi
-        Eta = (lat/180)*np.pi
-        DL_Ridges_cv = np.concatenate([(DLSCMS_pts[:,3]*np.cos(Phi)*np.cos(Eta)).reshape(-1,1), 
-                                    (DLSCMS_pts[:,3]*np.sin(Phi)*np.cos(Eta)).reshape(-1,1),
-                                    (DLSCMS_pts[:,3]*np.sin(Eta)).reshape(-1,1)], axis=1)
+        # lon, lat, R = cart2sph(*DLSCMS_pts[:,:3].T)
+        # Phi = (lon/180)*np.pi
+        # Eta = (lat/180)*np.pi
+        # DL_Ridges_cv = np.concatenate([(DLSCMS_pts[:,3]*np.cos(Phi)*np.cos(Eta)).reshape(-1,1), 
+        #                             (DLSCMS_pts[:,3]*np.sin(Phi)*np.cos(Eta)).reshape(-1,1),
+        #                             (DLSCMS_pts[:,3]*np.sin(Eta)).reshape(-1,1)], axis=1)
 
 
         # Compute the manifold recovering errors of the estimated ridges
@@ -175,34 +175,32 @@ for N in [500]:
         # 1. Euclidean distance errors from estimated ridges to the true curve
         DLRidge_Err = pd.DataFrame(DL_Ridges).apply(lambda x: DistToCurve(x, cur_true_3D), 
                                                     axis=1)
-        DLRidge_Err_cv = pd.DataFrame(DL_Ridges_cv).apply(lambda x: DistToCurve(x, cur_true_3D), 
-                                                    axis=1)
+        # DLRidge_Err_cv = pd.DataFrame(DL_Ridges_cv).apply(lambda x: DistToCurve(x, cur_true_3D), 
+        #                                             axis=1)
         EuRidge1_Err = pd.DataFrame(EuSCMS_pts1).apply(lambda x: DistToCurve(x, cur_true_3D), 
                                                        axis=1)
         EuRidge2_Err = pd.DataFrame(Eu_Ridges2).apply(lambda x: DistToCurve(x, cur_true_3D), 
                                                       axis=1)
         DistErr_df = pd.DataFrame({'SCMS_3D': EuRidge1_Err, 
                                    'SCMS_2Ang_1Lin': EuRidge2_Err, 
-                                   'DirLinSCMS_Omega2_Lin': DLRidge_Err,
-                                   'DirLinSCMS_Omega2_Lin_cv': DLRidge_Err_cv})
+                                   'DirLinSCMS_Omega2_Lin': DLRidge_Err})
         # 2. Euclidean distance errors from the true curve to estimated ridges
         DLRidge_CurRecErr = pd.DataFrame(cur_true_3D).apply(lambda x: DistToCurve(x, DL_Ridges), 
                                                             axis=1)
-        DLRidge_CurRecErr_cv = pd.DataFrame(cur_true_3D).apply(lambda x: DistToCurve(x, DL_Ridges_cv), 
-                                                            axis=1)
+        # DLRidge_CurRecErr_cv = pd.DataFrame(cur_true_3D).apply(lambda x: DistToCurve(x, DL_Ridges_cv), 
+        #                                                     axis=1)
         EuRidge1_CurRecErr = pd.DataFrame(cur_true_3D).apply(lambda x: DistToCurve(x, EuSCMS_pts1), 
                                                              axis=1)
         EuRidge2_CurRecErr = pd.DataFrame(cur_true_3D).apply(lambda x: DistToCurve(x, Eu_Ridges2), 
                                                              axis=1)
         CurRecErr_df = pd.DataFrame({'SCMS_3D': EuRidge1_CurRecErr, 
                                       'SCMS_2Ang_1Lin': EuRidge2_CurRecErr, 
-                                      'DirLinSCMS_Omega2_Lin': DLRidge_CurRecErr,
-                                      'DirLinSCMS_Omega2_Lin_cv': DLRidge_CurRecErr_cv})
+                                      'DirLinSCMS_Omega2_Lin': DLRidge_CurRecErr})
         # Manifold recovering errors of the estimated ridges
         print('The manifold recovering errors of the estimated ridges are \n')
         print((np.mean(DistErr_df, axis=0) + np.mean(CurRecErr_df, axis=0))/2)
         print('\n')
 
 
-        with open('./Results/Simulation3_N_'+str(N)+'_'+str(job_id)+'_new.dat', "wb") as file:
+        with open('./Results/Simulation3_N_'+str(N)+'_'+str(job_id)+'.dat', "wb") as file:
             pickle.dump([(np.mean(DistErr_df, axis=0) + np.mean(CurRecErr_df, axis=0))/2], file)

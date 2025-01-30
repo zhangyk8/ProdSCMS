@@ -119,40 +119,40 @@ for N in [500, 1000, 2000]:
                                     (DLSCMS_pts[:,3]*np.sin(Eta)).reshape(-1,1)], axis=1)
         
         # LSCV Bandwidth selection
-        bw1, bw2 = LSCV_BW(sim_dat1, com_type=['Dir', 'Lin'], dim=[2,1], 
-                                       h1_range=None, h2_range=None)
+        # bw1, bw2 = LSCV_BW(sim_dat1, com_type=['Dir', 'Lin'], dim=[2,1], 
+        #                                h1_range=None, h2_range=None)
         
-        ray.init(include_dashboard=False)
-        mesh_0 = sim_dat1
-        dataset = sim_dat1
-        chunksize = 10
-        num_p = mesh_0.shape[0]
-        result_ids = []
-        for i in range(0, num_p, chunksize):
-            result_ids.append(DirLinProdSCMSLog_Fast.remote(mesh_0[i:(i+chunksize)], 
-                                                            dataset, d=2, h=[bw1, bw2], 
-                                                            com_type=['Dir','Lin'], 
-                                                            dim=[2,1], eps=1e-7, 
-                                                            max_iter=5000))
-        DLSCMS_pts = ray.get(result_ids)
-        DLSCMS_pts = np.concatenate(DLSCMS_pts, axis=0)
-        ray.shutdown()
+        # ray.init(include_dashboard=False)
+        # mesh_0 = sim_dat1
+        # dataset = sim_dat1
+        # chunksize = 10
+        # num_p = mesh_0.shape[0]
+        # result_ids = []
+        # for i in range(0, num_p, chunksize):
+        #     result_ids.append(DirLinProdSCMSLog_Fast.remote(mesh_0[i:(i+chunksize)], 
+        #                                                     dataset, d=2, h=[bw1, bw2], 
+        #                                                     com_type=['Dir','Lin'], 
+        #                                                     dim=[2,1], eps=1e-7, 
+        #                                                     max_iter=5000))
+        # DLSCMS_pts = ray.get(result_ids)
+        # DLSCMS_pts = np.concatenate(DLSCMS_pts, axis=0)
+        # ray.shutdown()
 
-        lon, lat, R = cart2sph(*DLSCMS_pts[:,:3].T)
-        Phi = (lon/180)*np.pi
-        Eta = (lat/180)*np.pi
-        DL_Ridges_cv = np.concatenate([(DLSCMS_pts[:,3]*np.cos(Phi)*np.cos(Eta)).reshape(-1,1), 
-                                    (DLSCMS_pts[:,3]*np.sin(Phi)*np.cos(Eta)).reshape(-1,1),
-                                    (DLSCMS_pts[:,3]*np.sin(Eta)).reshape(-1,1)], axis=1)
+        # lon, lat, R = cart2sph(*DLSCMS_pts[:,:3].T)
+        # Phi = (lon/180)*np.pi
+        # Eta = (lat/180)*np.pi
+        # DL_Ridges_cv = np.concatenate([(DLSCMS_pts[:,3]*np.cos(Phi)*np.cos(Eta)).reshape(-1,1), 
+        #                             (DLSCMS_pts[:,3]*np.sin(Phi)*np.cos(Eta)).reshape(-1,1),
+        #                             (DLSCMS_pts[:,3]*np.sin(Eta)).reshape(-1,1)], axis=1)
         
         # Compute the manifold recovering errors of the estimated ridges/principal surface
         ## Euclidean distance errors from estimated ridges to the true spherical cone
         DLRidge_Err = \
             pd.DataFrame(DL_Ridges).apply(lambda x: DistToCone(pt=x, theta=(90-lat_cir)*np.pi/180), 
                                           axis=1)
-        DLRidge_Err_cv = \
-            pd.DataFrame(DL_Ridges_cv).apply(lambda x: DistToCone(pt=x, theta=(90-lat_cir)*np.pi/180), 
-                                          axis=1)
+        # DLRidge_Err_cv = \
+        #     pd.DataFrame(DL_Ridges_cv).apply(lambda x: DistToCone(pt=x, theta=(90-lat_cir)*np.pi/180), 
+        #                                   axis=1)
         EuRidge1_Err = \
             pd.DataFrame(EuSCMS_pts1).apply(lambda x: DistToCone(pt=x, theta=(90-lat_cir)*np.pi/180), 
                                             axis=1)
@@ -161,8 +161,7 @@ for N in [500, 1000, 2000]:
                                            axis=1)
         DistErr_df = pd.DataFrame({'SCMS_3D': EuRidge1_Err, 
                                    'SCMS_2Ang_1Lin': EuRidge2_Err, 
-                                   'DirLinSCMS_Omega2_Lin': DLRidge_Err,
-                                   'DirLinSCMS_Omega2_Lin_cv': DLRidge_Err_cv})
+                                   'DirLinSCMS_Omega2_Lin': DLRidge_Err})
         ## Euclidean distance errors from the true spherical cone to estimated ridges
         # Sample 5000 random observations on the true spherical cone
         rand_pts_cone = RandomPtsCone(N=5000, semi_open_ang=90-lat_cir, zmin=0, zmax=2, 
@@ -170,9 +169,9 @@ for N in [500, 1000, 2000]:
         DLRidge_SurfRecErr = \
             pd.DataFrame(rand_pts_cone).apply(lambda x: SurfRecoverError(pt=x, Ridge=DL_Ridges), 
                                               axis=1)
-        DLRidge_SurfRecErr_cv = \
-            pd.DataFrame(rand_pts_cone).apply(lambda x: SurfRecoverError(pt=x, Ridge=DL_Ridges_cv), 
-                                              axis=1)
+        # DLRidge_SurfRecErr_cv = \
+        #     pd.DataFrame(rand_pts_cone).apply(lambda x: SurfRecoverError(pt=x, Ridge=DL_Ridges_cv), 
+        #                                       axis=1)
         EuRidge1_SurfRecErr = \
             pd.DataFrame(rand_pts_cone).apply(lambda x: SurfRecoverError(pt=x, Ridge=EuSCMS_pts1), 
                                               axis=1)
@@ -181,8 +180,7 @@ for N in [500, 1000, 2000]:
                                               axis=1)
         SurfRecErr_df = pd.DataFrame({'SCMS_3D': EuRidge1_SurfRecErr, 
                                       'SCMS_2Ang_1Lin': EuRidge2_SurfRecErr, 
-                                      'DirLinSCMS_Omega2_Lin': DLRidge_SurfRecErr, 
-                                      'DirLinSCMS_Omega2_Lin_cv': DLRidge_SurfRecErr_cv})
+                                      'DirLinSCMS_Omega2_Lin': DLRidge_SurfRecErr})
         # Manifold recovering errors of the estimated ridges
         print('The manifold recovering errors of the estimated ridges are \n')
         print((np.mean(DistErr_df, axis=0) + np.mean(SurfRecErr_df, axis=0))/2)
