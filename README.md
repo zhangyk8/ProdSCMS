@@ -26,6 +26,7 @@ Some high-level descriptions of our Python scripts are as follows:
 - **Spiral_Curve.py**: This script contains code for comparing the results of the regular SCMS and our proposed SCMS algorithms on the simulated spiral curve data. (Figure 2 in the arxiv version of the paper).
 - **Utility_fun.py**: This script contains all the utility functions for our experiments.
 - **Varying_Stepsize.py**: This script contains code for investigating the effects of varying the stepsize parameter in our proposed SCMS algorithm in Euclidean/directional product spaces. (Figures 9 and 10 in the arxiv version of the paper). The script takes more than 1.5 hours to execute due to the slow convergence of the proposed SCMS algorithm with step size "eta=1". The SCMS algorithm with our suggested choice of the step size parameter, however, does converge very fast.
+- Other Monte Carlo simulation results across different sample sizes can be found in the folder **Repeated_Simulation**.
 
 ### 1. Motivation: Euclidean/Directional Product Spaces
 
