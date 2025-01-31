@@ -103,23 +103,29 @@ for N in [500, 1000, 2000]:
           +str(np.std(sim2_avg_DirDir_cv)/np.sqrt(len(sim2_avg_DirDir_cv)))+'.\n')
 
 
-sim3_avg_err = []
-for k in range(1, 1001):
-    with open('./Results/Simulation3_'+str(k)+'.dat', "rb") as file:
-        avg_err = pickle.load(file)
-    sim3_avg_err.append(avg_err[0].values)
+for N in [500, 1000, 2000]:
+    print('The current sample size for Simulation 3 is '+str(N)+'.\n')
     
-res_err = pd.DataFrame(np.array(sim3_avg_err), columns=pd.DataFrame(avg_err[0]).index)
-print('The average manifold-recovering errors for Simulation 3 are \n'+str(np.mean(res_err, axis=0))+\
-      ' with standard error: \n'+str(np.std(res_err, axis=0)/res_err.shape[0]))
-    
+    sim3_avg_err = []
+    for k in range(1, 1001):
+        with open('./Results/Simulation3_N_'+str(N)+'_'+str(k)+'.dat', "rb") as file:
+            avg_err = pickle.load(file)
+        sim3_avg_err.append(avg_err[0].values)
+        
+    res_err = pd.DataFrame(np.array(sim3_avg_err), columns=pd.DataFrame(avg_err[0]).index)
+    print('The average manifold-recovering errors for Simulation 3 are \n'+str(np.mean(res_err, axis=0))+\
+          ' with standard error: \n'+str(np.std(res_err, axis=0)/res_err.shape[0]))
 
-sim4_avg_err = []
-for k in range(1, 1001):
-    with open('./Results/Simulation4_'+str(k)+'.dat', "rb") as file:
-        avg_err = pickle.load(file)
-    sim4_avg_err.append(avg_err[0].values)
+
+for N in [500, 1000, 2000]:
+    print('The current sample size for Simulation 4 is '+str(N)+'.\n')
     
-res_err = pd.DataFrame(np.array(sim4_avg_err), columns=pd.DataFrame(avg_err[0]).index)
-print('The average manifold-recovering errors Simulation 4 are \n'+str(np.mean(res_err, axis=0))+\
-      ' with standard error: \n'+str(np.std(res_err, axis=0)/res_err.shape[0]))
+    sim4_avg_err = []
+    for k in range(1, 1001):
+        with open('./Results/Simulation4_N_'+str(N)+'_'+str(k)+'.dat', "rb") as file:
+            avg_err = pickle.load(file)
+        sim4_avg_err.append(avg_err[0][:3].values)
+        
+    res_err = pd.DataFrame(np.array(sim4_avg_err), columns=pd.DataFrame(avg_err[0]).index)
+    print('The average manifold-recovering errors Simulation 4 are \n'+str(np.mean(res_err, axis=0))+\
+          ' with standard error: \n'+str(np.std(res_err, axis=0)/res_err.shape[0]))
