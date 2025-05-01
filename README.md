@@ -345,7 +345,7 @@ fig.savefig('./Figures/DirLin_example.png')
  - U. Ozertem and D. Erdogmus (2011). Locally defined principal curves and surfaces. _Journal of Machine Learning Research_, 12(34):1249–1286.
  - S. J. Wright (2015). Coordinate descent algorithms. _Mathematical Programming_, 151(1):3–34.
  - E. Arias-Castro, D. Mason, and B. Pelletier (2016). On the estimation of the gradient lines of a density and the consistency of the mean-shift algorithm. _Journal of Machine Learning Research_, 17(43):1–28.
- - Y. Zhang and Y.-C. Chen (2023). [Linear Convergence of the Subspace Constrained Mean Shift Algorithm: From Euclidean to Directional Data](https://doi.org/10.1093/imaiai/iaac005) _Information and Inference: A Journal of the IMA_, **12**(1), 210-311.
- - E. Garcı́a-Portugués (2013). Exact risk improvement of bandwidth selectors for kernel density estimation with directional data. _Electronic Journal of Statistics_ **7** 1655–1685.
+ - Y. Zhang and Y.-C. Chen (2023). [Linear Convergence of the Subspace Constrained Mean Shift Algorithm: From Euclidean to Directional Data](https://doi.org/10.1093/imaiai/iaac005) _Information and Inference: A Journal of the IMA_, **12**(1): 210-311.
+ - E. Garcı́a-Portugués (2013). Exact risk improvement of bandwidth selectors for kernel density estimation with directional data. _Electronic Journal of Statistics_ **7**: 1655–1685.
 - Y.-C. Chen, C. Genovese, and L. Wasserman (2016). [A comprehensive approach to mode clustering](https://projecteuclid.org/euclid.ejs/1455715961). _Electronic Journal of Statistics_ **10**(1) 210-241.
 
