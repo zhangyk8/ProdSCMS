@@ -339,13 +339,13 @@ fig.savefig('./Figures/DirLin_example.png')
  Other simulation studies on directional-directional data (e.g., observations on a torus) and real-world applications of our proposed (subspace constrained) mean shift algorithms can be found in our paper.
 
 ### Additional References
- - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3, 2020.
- - Y. Cheng. Mean shift, mode seeking, and clustering. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 17(8):790–799, 1995.
- - D. Comaniciu and P. Meer. Mean shift: a robust approach toward feature space analysis. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 24(5):603–619, 2002.
- - U. Ozertem and D. Erdogmus. Locally defined principal curves and surfaces. _Journal of Machine Learning Research_, 12(34):1249–1286, 2011.
- - S. J. Wright. Coordinate descent algorithms. _Mathematical Programming_, 151(1):3–34, 2015.
- - E. Arias-Castro, D. Mason, and B. Pelletier. On the estimation of the gradient lines of a density and the consistency of the mean-shift algorithm. _Journal of Machine Learning Research_, 17(43):1–28, 2016.
- - Y. Zhang and Y.-C. Chen. Linear convergence of the subspace constrained mean shift algorithm: From euclidean to directional data. arXiv preprint [arXiv:2104.14977](https://arxiv.org/abs/2104.14977), 2021.
+ - R. Ahumada, C. A.Prieto, A. Almeida, F. Anders, S. F. Anderson, B. H. Andrews, B. Anguiano, R. Arcodia, E. Armengaud, M. Aubert, et al. (2020). The 16th data release of the sloan digital sky surveys: first release from the apogee-2 southern survey and full release of eboss spectra. _The Astrophysical Journal Supplement Series_, 249(1):3.
+ - Y. Cheng (1995). Mean shift, mode seeking, and clustering. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 17(8):790–799.
+ - D. Comaniciu and P. Meer (2002). Mean shift: a robust approach toward feature space analysis. _IEEE Transactions on Pattern Analysis and Machine Intelligence_, 24(5):603–619.
+ - U. Ozertem and D. Erdogmus (2011). Locally defined principal curves and surfaces. _Journal of Machine Learning Research_, 12(34):1249–1286.
+ - S. J. Wright (2015). Coordinate descent algorithms. _Mathematical Programming_, 151(1):3–34.
+ - E. Arias-Castro, D. Mason, and B. Pelletier (2016). On the estimation of the gradient lines of a density and the consistency of the mean-shift algorithm. _Journal of Machine Learning Research_, 17(43):1–28.
+ - Y. Zhang and Y.-C. Chen (2023). [Linear Convergence of the Subspace Constrained Mean Shift Algorithm: From Euclidean to Directional Data](https://doi.org/10.1093/imaiai/iaac005) _Information and Inference: A Journal of the IMA_, **12**(1), 210-311.
  - E. Garcı́a-Portugués (2013). Exact risk improvement of bandwidth selectors for kernel density estimation with directional data. _Electronic Journal of Statistics_ **7** 1655–1685.
 - Y.-C. Chen, C. Genovese, and L. Wasserman (2016). [A comprehensive approach to mode clustering](https://projecteuclid.org/euclid.ejs/1455715961). _Electronic Journal of Statistics_ **10**(1) 210-241.
 
